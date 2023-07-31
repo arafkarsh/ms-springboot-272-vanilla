@@ -6,23 +6,23 @@ spring.profiles.default=dev
 # Service Name & API Details -  Version, Path
 # =======================================================================
 service.org=orgname
-service.name=MS-Cache
-service.api.name=ms-cache
+service.name=MS-Vanilla
+service.api.name=ms-vanilla
 service.api.prefix=api
 service.api.version=v1
 service.api.error.prefix=13
 service.container=ms-cache-service
-service.api.repository=https://github.com/arafkarsh/ms-springboot-272-java-8
+service.api.repository=https://github.com/arafkarsh/ms-springboot-272-vanilla
 service.api.path=/${service.api.name}/${service.api.prefix}/${service.api.version}
 service.url=http://www.metarivu.com/
 service.license=Apache 2 License
 # =======================================================================
 # Microservice Server Properties
 # =======================================================================
-server.port=9090
-server.version=0.5.9
+server.port=9089
+server.version=0.4.0
 server.restart=false
-server.leak.test=5
+server.leak.test=3
 server.resources.url=${service.url}${service.api.path}
 # ------------------------------------------------------------------------
 # Security & JWT Token  (Type 1 = secret key, 2 = public / private key)
@@ -99,7 +99,7 @@ kafka.streams.topic.3=ms_cache_272.ms_schema.products_pro
 # =======================================================================
 db.server=mem
 db.port=5432
-db.name=ms_cache_272
+db.name=ms_vanilla_272
 db.schema=ms_schema
 db.vendor=H2
 # To Store the Data in File
