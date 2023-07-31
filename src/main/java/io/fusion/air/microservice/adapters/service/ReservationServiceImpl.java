@@ -17,13 +17,11 @@ package io.fusion.air.microservice.adapters.service;
 // Custom
 import io.fusion.air.microservice.adapters.repository.ReservationRepository;
 import io.fusion.air.microservice.domain.entities.reservation.ReservationEntity;
-import io.fusion.air.microservice.domain.exceptions.BusinessServiceException;
 import io.fusion.air.microservice.domain.exceptions.DataNotFoundException;
 import io.fusion.air.microservice.domain.exceptions.DatabaseException;
 import io.fusion.air.microservice.domain.exceptions.InputDataException;
 import io.fusion.air.microservice.domain.ports.services.ReservationService;
 import io.fusion.air.microservice.domain.ports.services.ReservationStateMachineService;
-import io.fusion.air.microservice.domain.statemachine.reservation.ReservationEvent;
 import io.fusion.air.microservice.utils.Utils;
 // Spring
 import org.springframework.beans.factory.annotation.Autowired;
@@ -178,33 +176,10 @@ public class ReservationServiceImpl implements ReservationService {
      * @return
      */
     public ReservationEntity handleEvent(String customerId, String reservationId, String event) {
-        ReservationEvent reservationEvent = ReservationEvent.fromString(event);
-        return handleEvent(customerId, reservationId, reservationEvent);
-    }
-
-    /**
-     * For Testing Purpose Only
-     * Handle Event - Generic Method
-     *
-     * @param customerId
-     * @param reservationId
-     * @param reservationEvent
-     * @return
-     */
-    public ReservationEntity handleEvent(String customerId, String reservationId, ReservationEvent reservationEvent) {
-        if(reservationEvent == null) {
-            throw new BusinessServiceException("Invalid Event for Reservation Processing!");
+        try {
+            throw new NoSuchMethodException("Method Not Implemented");
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
         }
-        Optional<ReservationEntity> reservationOpt = findById( customerId,  reservationId);
-        log.info("Handle Event "+reservationEvent+" For reservation ID = "+reservationId);
-        System.out.println("--------------------------------------------------------------------------------------------------");
-        System.out.println("(1) INCOMING EVENT == (reservationServiceImpl) === ["+reservationEvent.name()+"] ======= >> reservationId = "+reservationId);
-        System.out.println("--------------------------------------------------------------------------------------------------");
-
-        ReservationEntity reservation = reservationOpt.get();
-        // Send Event to the State Machine
-        reservationStateMachineService.sendEvent(reservationEvent, reservation);
-
-        return reservation;
     }
 }

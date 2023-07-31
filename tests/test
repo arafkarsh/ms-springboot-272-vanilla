@@ -3,9 +3,9 @@
 # @author: Araf Karsh Hamid
 # -------------------------------------------------------------------------------------------
 
-PORT=9090
+PORT=9089
 API_VERSION=v1
-SERVICE=ms-cache
+SERVICE=ms-vanilla
 
 echo "---------------------------------------------------------------------------------------"
 echo "Testing ${SERVICE} Microservice"

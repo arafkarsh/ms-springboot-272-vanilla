@@ -16,5 +16,5 @@ echo "App running with profile = $runMode"
 # mvn spring-boot:run -Dspring-boot.run.profiles=$runMode
 
 # Run Java command
-echo "java -jar target/ms-cache-service-*-spring-boot.jar --spring.profiles.active=$runMode"
-java -jar target/ms-cache-service-*-spring-boot.jar --spring.profiles.active=$runMode
+echo "java -jar target/ms-vanilla-service-*-spring-boot.jar --spring.profiles.active=$runMode"
+java -jar target/ms-vanilla-service-*-spring-boot.jar --spring.profiles.active=$runMode

@@ -11,7 +11,7 @@ service.api.name=ms-vanilla
 service.api.prefix=api
 service.api.version=v1
 service.api.error.prefix=13
-service.container=ms-cache-service
+service.container=ms-vanilla-service
 service.api.repository=https://github.com/arafkarsh/ms-springboot-272-vanilla
 service.api.path=/${service.api.name}/${service.api.prefix}/${service.api.version}
 service.url=http://www.metarivu.com/
@@ -65,35 +65,6 @@ logging.file.max-size=30MB
 # Keep Log Files for 100 Days with Max Cap at 3 GB
 logging.file.max-history=100
 logging.file.total-size-cap=3GB
-# =======================================================================
-# Kafka Pub / Sub Configuration (Possible Ack Values > All, 1, 0)
-# =======================================================================
-spring.application.name=ms-cache
-spring.kafka.bootstrap-servers=127.0.0.1:9092
-kafka.consumer.group.1=fusionGroup1
-kafka.consumer.group.2=fusionGroup2
-# Topic 1 (Name, Partitions, Replicas, Ack Type)
-kafka.topic.1.create=false
-kafka.topic.1=fusionTopic1
-kafka.topic.1.partitions=3
-kafka.topic.1.replica=1
-kafka.topic.1.acks=1
-# Topic 2 (Name, Partitions, Replicas, Ack Type)
-kafka.topic.2.create=false
-kafka.topic.2=fusionTopic2
-kafka.topic.2.partitions=5
-kafka.topic.2.replica=1
-kafka.topic.2.acks=1
-# =======================================================================
-# Kafka Connect Configuration
-# =======================================================================
-# =======================================================================
-# Kafka Streams Configuration
-# =======================================================================
-spring.kafka.streams.auto-startup=false
-kafka.streams.topic.1=ms_cache_272.ms_schema.products_m
-kafka.streams.topic.2=ms_cache_272.ms_schema.products_data
-kafka.streams.topic.3=ms_cache_272.ms_schema.products_pro
 # =======================================================================
 # Database Properties
 # =======================================================================
