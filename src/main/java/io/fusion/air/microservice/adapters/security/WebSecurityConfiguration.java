@@ -81,6 +81,18 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.headers().frameOptions().deny();
         // Only for Local Testing
         // http.headers().frameOptions().disable();
+
+        // The X-XSS-Protection header is designed to enable the cross-site scripting (XSS) filter built into modern web
+        // browsers. This header is usually enabled by default, but using it will enforce it. The mode=block option
+        // will block any detected XSS attack.
+        http.headers().xssProtection().block(true);
+
+        // The X-Content-Type-Options header is designed to protect against MIME type sniffing. MIME type sniffing is a
+        // browser behavior where it tries to determine the MIME type of a resource by inspecting the content itself.
+        // This behavior is exploited by attackers to perform cross-site scripting (XSS) and content injection attacks.
+        // The nosniff option will prevent browsers from performing MIME type sniffing.
+        // http.headers().contentTypeOptions().nosniff();
+
         String hostName = serviceConfig.getServerHost();
         // Content Security Policy
         // The last part sets the Content Security Policy (CSP). This is a security measure that helps prevent a range

@@ -260,8 +260,16 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional(rollbackFor = { SQLException.class })
     public ProductEntity updateProduct(ProductEntity product) {
-        productRepository.saveAndFlush(product);
-        return product;
+        ProductEntity productUpdate = getProductById(product.getUuid()) ;
+        if(productUpdate != null) {
+            productUpdate.setProductName(product.getProductName());
+            productUpdate.setProductDetails(product.getProductDetails());
+            productUpdate.setProductPrice(product.getProductPrice());
+            productRepository.saveAndFlush(productUpdate);
+            return productUpdate;
+        } else {
+            throw new DataNotFoundException("Data not found with id : " + product.getUuid());
+        }
     }
 
     /**
