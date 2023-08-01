@@ -102,7 +102,7 @@ public class FixedControllerImpl extends AbstractController {
 		String productName = HtmlUtils.htmlEscape(_productName);
 		String location = HtmlUtils.htmlEscape(_location);
 
-		log.debug("|"+name()+"|Request to Search the Product By Name ... "+productName);
+		log.debug("|"+name()+"|Security Fixed: Request to Search the Product By Name ... "+productName);
 		List<ProductEntity> products = productServiceImpl.findProductsAndPriceGreaterThan(
 				productName, location, _productPrice);
 
@@ -113,6 +113,13 @@ public class FixedControllerImpl extends AbstractController {
 	}
 
 	/**
+	 * Cross-Site Scripting (XSS) attacks occur
+	 * - when an attacker uses a web application to send the malicious script,
+	 * - Generally in the form of a browser-side script to a different end user.
+	 * - The end user’s browser cannot know that the script should not be trusted
+	 * - and will execute the script. XSS attacks can lead to a variety of problems,
+	 * - including stolen session tokens or login credentials, defacement of websites, or malicious redirection.
+	 *
 	 * Update the Product Details
 	 * This API Can be tested for Optimistic Lock Exceptions as the Entity is a Versioned Entity
 	 */
@@ -138,7 +145,7 @@ public class FixedControllerImpl extends AbstractController {
 
 		System.out.println("<><> AFTER Sanitization:"+Utils.toJsonString(_product)+"\n");
 
-		log.debug("|"+name()+"|Request to Update Product Details... "+_product);
+		log.debug("|"+name()+"|Security Fixed: Request to Update Product Details... "+_product);
 		ProductEntity prodEntity = productServiceImpl.updateProduct(_product);
 		StandardResponse stdResponse = createSuccessResponse("Product Updated!");
 		stdResponse.setPayload(prodEntity);

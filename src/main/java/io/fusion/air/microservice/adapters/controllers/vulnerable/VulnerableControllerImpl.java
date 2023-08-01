@@ -103,7 +103,7 @@ public class VulnerableControllerImpl extends AbstractController {
 
 		// The Inputs are NOT Sanitized and hence the Search is Vulnerable to XSS Attack.
 
-		log.debug("|"+name()+"|Request to Search the Product By Name ... "+_productName);
+		log.debug("|"+name()+"|Security Vulnerable: Request to Search the Product By Name ... "+_productName);
 		List<ProductEntity> products = productServiceImpl.findProductsAndPriceGreaterThan(
 				_productName, _location, _productPrice);
 
@@ -114,6 +114,13 @@ public class VulnerableControllerImpl extends AbstractController {
 	}
 
 	/**
+	 * Cross-Site Scripting (XSS) attacks occur
+	 * - when an attacker uses a web application to send the malicious script,
+	 * - Generally in the form of a browser-side script to a different end user.
+	 * - The end user’s browser cannot know that the script should not be trusted
+	 * - and will execute the script. XSS attacks can lead to a variety of problems,
+	 * - including stolen session tokens or login credentials, defacement of websites, or malicious redirection.
+	 *
 	 * Update the Product Details
 	 * This API Can be tested for Optimistic Lock Exceptions as the Entity is a Versioned Entity
 	 */
@@ -127,10 +134,11 @@ public class VulnerableControllerImpl extends AbstractController {
 					content = @Content)
 	})
 	@PutMapping("/product/update/")
-	public ResponseEntity<StandardResponse> updateProduct(@Valid @RequestBody ProductEntity _product) {
+	public ResponseEntity<StandardResponse> updateProduct(@RequestBody ProductEntity _product) {
+		// No Request  Body Validation is done.
 		// The Inputs are NOT Sanitized and hence the Search is Vulnerable to XSS Attack.
 
-		log.debug("|"+name()+"|Request to Update Product Details... "+_product);
+		log.debug("|"+name()+"|Security Vulnerable: Request to Update Product Details... "+_product);
 		ProductEntity prodEntity = productServiceImpl.updateProduct(_product);
 		StandardResponse stdResponse = createSuccessResponse("Product Updated!");
 		stdResponse.setPayload(prodEntity);
