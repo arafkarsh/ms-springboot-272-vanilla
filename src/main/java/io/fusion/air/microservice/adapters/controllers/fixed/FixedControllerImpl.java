@@ -276,7 +276,6 @@ public class FixedControllerImpl extends AbstractController {
 	}
 
 	private String readData(Process process) {
-		System.out.println("<><> 1. Reading Data...	");
 		// Read the output from the process
 		StringBuilder content = new StringBuilder();
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
@@ -289,7 +288,6 @@ public class FixedControllerImpl extends AbstractController {
 			// Handle the exception
 			e.printStackTrace();
 		} finally {
-			System.out.println("<><> 2. Reading Data...	");
 			if(content.toString().length() > 1) {
 				return content.toString();
 			}
