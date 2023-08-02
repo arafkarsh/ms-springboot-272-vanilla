@@ -265,6 +265,12 @@ public class FixedControllerImpl extends AbstractController {
 	public ResponseEntity<String> commandExecute(@RequestParam("_fileName") String _fileName) {
 		log.debug("|"+name()+"|Security Fixed: Request to Read File using CMD "+_fileName);
 		try {
+			// Fix the File Vulnerability (Directory Traversal Attack)
+			// Check For Directory Traversal Attack
+			if (_fileName.contains("..")) {
+				// Reject the request
+				throw new DataNotFoundException("Invalid path for File: "+_fileName);
+			}
 			// Using ProcessBuilder to safely pass filename as an argument
 			ProcessBuilder builder = new ProcessBuilder("cat", _fileName);
 			Process process = builder.start();
