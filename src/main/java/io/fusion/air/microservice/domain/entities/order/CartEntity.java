@@ -42,7 +42,6 @@ public class CartEntity extends AbstractBaseEntityWithUUID {
     @Column(name = "customerId")
     @Size(min = 36, max = 36, message = "The length of Customer ID Name must be 36 characters.")
     @Pattern(regexp = "^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$", message = "Invalid Customer UUID")
-
     private String customerId;
 
     @NotNull

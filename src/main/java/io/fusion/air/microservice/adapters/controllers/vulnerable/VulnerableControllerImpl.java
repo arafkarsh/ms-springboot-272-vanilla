@@ -15,9 +15,8 @@
  */
 package io.fusion.air.microservice.adapters.controllers.vulnerable;
 
-import io.fusion.air.microservice.domain.entities.order.CountryEntity;
-import io.fusion.air.microservice.domain.entities.order.CountryGeoEntity;
 import io.fusion.air.microservice.domain.entities.order.ProductEntity;
+import io.fusion.air.microservice.domain.exceptions.DataNotFoundException;
 import io.fusion.air.microservice.domain.models.core.StandardResponse;
 import io.fusion.air.microservice.domain.ports.services.CountryService;
 import io.fusion.air.microservice.domain.ports.services.ProductService;
@@ -31,14 +30,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.RequestScope;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.*;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -143,6 +140,61 @@ public class VulnerableControllerImpl extends AbstractController {
 		StandardResponse stdResponse = createSuccessResponse("Product Updated!");
 		stdResponse.setPayload(prodEntity);
 		return ResponseEntity.ok(stdResponse);
+	}
+
+
+	/**
+	 * Directory traversal attacks involve exploiting insufficient security validation / sanitization of user-supplied
+	 * input file names, so that characters representing "traverse to parent directory" are passed through to the file
+	 * APIs. This could potentially allow the attacker to read or write files outside of the intended directory.
+	 *
+	 * Countermeasures involve validating and sanitizing input, implementing secure error handling, and adhering to
+	 * the principle of least privilege.
+	 *
+	 * Read the File from the Resource Folder
+	 * @param _fileName
+	 * @return
+	 */
+	@Operation(summary = "Read File")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					description = "File Read",
+					content = {@Content(mediaType = "application/text")}),
+			@ApiResponse(responseCode = "400",
+					description = "Unable to Read File",
+					content = @Content)
+	})
+	@GetMapping("/readFile")
+	public ResponseEntity<String> readFile(@RequestParam("_fileName") String _fileName) {
+		log.debug("|"+name()+"|Security Vulnerable: Request to Read File "+_fileName);
+		String fileContent = readFromFile(_fileName);
+		return ResponseEntity.ok(fileContent);
+	}
+
+	/**
+	 * Vulnerable to Directory Traversal Attack
+	 *
+	 * Read the File from the Resource Folder
+	 * @param _fileName
+	 * @return
+	 */
+	private String readFromFile(String _fileName) {
+		File file = new File(_fileName);
+		StringBuilder sb = new StringBuilder();
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				// System.out.println(line);
+				sb.append(line).append(System.lineSeparator());
+			}
+		} catch (FileNotFoundException e) {
+			throw new DataNotFoundException("Error: File Not Found! "+_fileName, e);
+		} catch (IOException e) {
+			throw new DataNotFoundException("Error: IO Exception! "+_fileName,e);
+		} catch (Exception e) {
+			throw new DataNotFoundException("Error: Exception! "+_fileName,e);
+		}
+		return sb.toString();
 	}
 
  }

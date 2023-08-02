@@ -15,8 +15,10 @@
  */
 package io.fusion.air.microservice.adapters.controllers.fixed;
 
+// Custom
 import io.fusion.air.microservice.domain.entities.order.CartEntity;
 import io.fusion.air.microservice.domain.entities.order.ProductEntity;
+import io.fusion.air.microservice.domain.exceptions.DataNotFoundException;
 import io.fusion.air.microservice.domain.models.core.StandardResponse;
 import io.fusion.air.microservice.domain.models.order.Cart;
 import io.fusion.air.microservice.domain.ports.services.CartService;
@@ -25,23 +27,31 @@ import io.fusion.air.microservice.domain.ports.services.ProductService;
 import io.fusion.air.microservice.server.config.ServiceConfiguration;
 import io.fusion.air.microservice.server.controllers.AbstractController;
 import io.fusion.air.microservice.utils.Utils;
+// Swagger Annotations
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.slf4j.Logger;
+// Spring Annotations
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.RequestScope;
 import org.springframework.web.util.HtmlUtils;
-
+// Java
 import javax.validation.Valid;
+import java.io.*;
 import java.math.BigDecimal;
 import java.util.List;
 
+// SLF4J
+import org.slf4j.Logger;
 import static java.lang.invoke.MethodHandles.lookup;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -188,6 +198,49 @@ public class FixedControllerImpl extends AbstractController {
 		StandardResponse stdResponse = createSuccessResponse("Cart Item Added!");
 		stdResponse.setPayload(cartItem);
 		return ResponseEntity.ok(stdResponse);
+	}
+
+	/**
+	 * Directory traversal attacks involve exploiting insufficient security validation / sanitization of user-supplied
+	 * input file names, so that characters representing "traverse to parent directory" are passed through to the file
+	 * APIs. This could potentially allow the attacker to read or write files outside of the intended directory.
+	 *
+	 * Countermeasures involve validating and sanitizing input, implementing secure error handling, and adhering to
+	 * the principle of least privilege.
+	 *
+	 * Read the File from the Resource Folder
+	 * @param _fileName
+	 * @return
+	 */
+	@Operation(summary = "Read File")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					description = "File Read",
+					content = {@Content(mediaType = "application/text")}),
+			@ApiResponse(responseCode = "400",
+					description = "Unable to Read File",
+					content = @Content)
+	})
+	@GetMapping("/readFile")
+	public ResponseEntity<InputStreamResource> readFile(@RequestParam("_fileName") String _fileName) {
+		log.debug("|"+name()+"|Security Vulnerable: Request to Read File "+_fileName);
+		String cleanPath = StringUtils.cleanPath(_fileName);
+
+		// Check For Directory Traversal Attack
+		if (cleanPath.contains("..")) {
+			// Reject the request
+			throw new DataNotFoundException("Invalid path for File: "+_fileName);
+		}
+		// Read Data From a Specific Location
+		try {
+			ClassPathResource htmlFile = new ClassPathResource("static/files/" + _fileName);
+			return ResponseEntity
+					.ok()
+					.contentType(MediaType.valueOf(MediaType.TEXT_HTML_VALUE))
+					.body(new InputStreamResource(htmlFile.getInputStream()));
+		} catch (Exception ex) {
+			throw new DataNotFoundException("Invalid path for File: "+_fileName);
+		}
 	}
 
  }
