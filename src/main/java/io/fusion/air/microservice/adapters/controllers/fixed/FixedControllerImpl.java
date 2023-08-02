@@ -191,7 +191,7 @@ public class FixedControllerImpl extends AbstractController {
 	@PostMapping("/cart/add")
 	public ResponseEntity<StandardResponse> addToCart(@Valid @RequestBody Cart _cart) {
 
-		// The Inputs (CartEntity) validated using Regex Patterns and hence the Search is NOT Vulnerable to XSS Attack.
+		// The Inputs (Cart Converted to CartEntity) validated using Regex Patterns and Add To Cart is NOT Vulnerable to XSS Attack.
 
 		log.debug("|"+name()+"|Security Fixed: Request to Add Cart Item... "+_cart.getProductName());
 		CartEntity cartItem = cartService.save(_cart);
