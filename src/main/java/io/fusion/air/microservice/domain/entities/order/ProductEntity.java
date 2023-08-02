@@ -41,11 +41,13 @@ public class ProductEntity extends AbstractBaseEntityWithUUID {
     @NotBlank(message = "The Product Name is required.")
     @Size(min = 3, max = 32, message = "The length of Product Name must be 3-32 characters.")
     @Column(name = "productName")
+    @Pattern(regexp = "^[a-zA-Z0-9 \\-]{3,32}$", message = "Must contain only alphanumeric characters, spaces, and dashes, up to 32 characters")
     private String productName;
 
     @NotNull(message = "The Product Details is  required.")
     @Size(min = 5, max = 64, message = "The length of Product Description must be 5-64 characters.")
     @Column(name = "productDetails")
+    @Pattern(regexp = "^[a-zA-Z0-9 ,\\-]{5,64}$", message = "Must contain only alphanumeric characters, spaces, commas, and dashes, up to 64 characters")
     private String productDetails;
 
     @NotNull(message = "The Price is required.")
