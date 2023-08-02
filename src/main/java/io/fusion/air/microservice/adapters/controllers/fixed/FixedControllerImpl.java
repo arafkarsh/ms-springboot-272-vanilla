@@ -15,8 +15,11 @@
  */
 package io.fusion.air.microservice.adapters.controllers.fixed;
 
+import io.fusion.air.microservice.domain.entities.order.CartEntity;
 import io.fusion.air.microservice.domain.entities.order.ProductEntity;
 import io.fusion.air.microservice.domain.models.core.StandardResponse;
+import io.fusion.air.microservice.domain.models.order.Cart;
+import io.fusion.air.microservice.domain.ports.services.CartService;
 import io.fusion.air.microservice.domain.ports.services.CountryService;
 import io.fusion.air.microservice.domain.ports.services.ProductService;
 import io.fusion.air.microservice.server.config.ServiceConfiguration;
@@ -70,6 +73,10 @@ public class FixedControllerImpl extends AbstractController {
 
 	@Autowired
 	private ProductService productServiceImpl;
+
+	@Autowired
+	private CartService cartService;
+
 
 
 	/**
@@ -149,6 +156,37 @@ public class FixedControllerImpl extends AbstractController {
 		ProductEntity prodEntity = productServiceImpl.updateProduct(_product);
 		StandardResponse stdResponse = createSuccessResponse("Product Updated!");
 		stdResponse.setPayload(prodEntity);
+		return ResponseEntity.ok(stdResponse);
+	}
+
+	/**
+	 * Cross-Site Scripting (XSS) attacks occur
+	 * - when an attacker uses a web application to send the malicious script,
+	 * - Generally in the form of a browser-side script to a different end user.
+	 * - The end user’s browser cannot know that the script should not be trusted
+	 * - and will execute the script. XSS attacks can lead to a variety of problems,
+	 * - including stolen session tokens or login credentials, defacement of websites, or malicious redirection.
+	 *
+	 * Add Cart Item to Cart
+	 */
+	@Operation(summary = "Add Item to Cart")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					description = "Add the Cart Item",
+					content = {@Content(mediaType = "application/json")}),
+			@ApiResponse(responseCode = "404",
+					description = "Unable to Add the Cart Item",
+					content = @Content)
+	})
+	@PostMapping("/cart/add")
+	public ResponseEntity<StandardResponse> addToCart(@Valid @RequestBody Cart _cart) {
+
+		// The Inputs (CartEntity) validated using Regex Patterns and hence the Search is NOT Vulnerable to XSS Attack.
+
+		log.debug("|"+name()+"|Request to Add Cart Item... "+_cart.getProductName());
+		CartEntity cartItem = cartService.save(_cart);
+		StandardResponse stdResponse = createSuccessResponse("Cart Item Added!");
+		stdResponse.setPayload(cartItem);
 		return ResponseEntity.ok(stdResponse);
 	}
 

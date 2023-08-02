@@ -22,6 +22,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 
 /**
@@ -38,13 +40,20 @@ public class CartEntity extends AbstractBaseEntityWithUUID {
 
     @NotNull
     @Column(name = "customerId")
+    @Size(min = 36, max = 36, message = "The length of Customer ID Name must be 36 characters.")
+    @Pattern(regexp = "^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$", message = "Invalid Customer UUID")
+
     private String customerId;
 
     @NotNull
     @Column(name = "productId")
+    @Size(min = 36, max = 36, message = "The length of Product ID Name must be 36 characters.")
+    @Pattern(regexp = "^[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}$", message = "Invalid Product UUID")
     private String productId;
 
     @Column(name = "productName")
+    @Size(min = 3, max = 32, message = "The length of Product Name must be 3-32 characters.")
+    @Pattern(regexp = "^[a-zA-Z0-9 \\-]{3,32}$", message = "Must contain only alphanumeric characters, spaces, and dashes, up to 32 characters")
     private String productName;
 
     @NotNull
