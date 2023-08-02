@@ -193,7 +193,7 @@ public class FixedControllerImpl extends AbstractController {
 
 		// The Inputs (CartEntity) validated using Regex Patterns and hence the Search is NOT Vulnerable to XSS Attack.
 
-		log.debug("|"+name()+"|Request to Add Cart Item... "+_cart.getProductName());
+		log.debug("|"+name()+"|Security Fixed: Request to Add Cart Item... "+_cart.getProductName());
 		CartEntity cartItem = cartService.save(_cart);
 		StandardResponse stdResponse = createSuccessResponse("Cart Item Added!");
 		stdResponse.setPayload(cartItem);
@@ -223,7 +223,7 @@ public class FixedControllerImpl extends AbstractController {
 	})
 	@GetMapping("/readFile")
 	public ResponseEntity<InputStreamResource> readFile(@RequestParam("_fileName") String _fileName) {
-		log.debug("|"+name()+"|Security Vulnerable: Request to Read File "+_fileName);
+		log.debug("|"+name()+"|Security Fixed: Request to Read File "+_fileName);
 		String cleanPath = StringUtils.cleanPath(_fileName);
 
 		// Check For Directory Traversal Attack
@@ -240,6 +240,60 @@ public class FixedControllerImpl extends AbstractController {
 					.body(new InputStreamResource(htmlFile.getInputStream()));
 		} catch (Exception ex) {
 			throw new DataNotFoundException("Invalid path for File: "+_fileName);
+		}
+	}
+
+	/**
+	 * Command Injection Vulnerability, also known as Shell Injection or OS Command Injection, is a type of injection
+	 * vulnerability where an attacker is able to execute arbitrary commands on the host operating system through a
+	 * vulnerable application. This kind of vulnerability arises when input provided by the user is improperly sanitized
+	 * before being passed to a system command.
+	 *
+	 * @param _fileName
+	 * @return
+	 */
+	@Operation(summary = "Read File by Executing Command")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					description = "File Read",
+					content = {@Content(mediaType = "application/text")}),
+			@ApiResponse(responseCode = "400",
+					description = "Unable to Read File",
+					content = @Content)
+	})
+	@GetMapping("/cmd/readFile")
+	public ResponseEntity<String> commandExecute(@RequestParam("_fileName") String _fileName) {
+		log.debug("|"+name()+"|Security Fixed: Request to Read File using CMD "+_fileName);
+		try {
+			// Using ProcessBuilder to safely pass filename as an argument
+			ProcessBuilder builder = new ProcessBuilder("cat", _fileName);
+			Process process = builder.start();
+			// Rest of the code to read the process's output
+			return ResponseEntity.ok(readData(process));
+		} catch (Exception e) {
+			throw new DataNotFoundException("Invalid CMD! For File: "+_fileName);
+		}
+	}
+
+	private String readData(Process process) {
+		System.out.println("<><> 1. Reading Data...	");
+		// Read the output from the process
+		StringBuilder content = new StringBuilder();
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+			String line;
+			while ((line = reader.readLine()) != null) {
+				content.append(line);
+				content.append(System.lineSeparator());
+			}
+		} catch (IOException e) {
+			// Handle the exception
+			e.printStackTrace();
+		} finally {
+			System.out.println("<><> 2. Reading Data...	");
+			if(content.toString().length() > 1) {
+				return content.toString();
+			}
+			return "No Data Available";
 		}
 	}
 

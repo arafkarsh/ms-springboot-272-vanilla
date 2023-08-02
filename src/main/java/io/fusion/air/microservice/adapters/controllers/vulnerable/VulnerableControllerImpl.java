@@ -197,4 +197,35 @@ public class VulnerableControllerImpl extends AbstractController {
 		return sb.toString();
 	}
 
+	/**
+	 * Command Injection Vulnerability, also known as Shell Injection or OS Command Injection, is a type of injection
+	 * vulnerability where an attacker is able to execute arbitrary commands on the host operating system through a
+	 * vulnerable application. This kind of vulnerability arises when input provided by the user is improperly sanitized
+	 * before being passed to a system command.
+	 *
+	 * @param _fileName
+	 * @return
+	 */
+	@Operation(summary = "Read File by Executing Command")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					description = "File Read",
+					content = {@Content(mediaType = "application/text")}),
+			@ApiResponse(responseCode = "400",
+					description = "Unable to Read File",
+					content = @Content)
+	})
+	@GetMapping("/cmd/readFile")
+	public ResponseEntity<String> commandExecute(@RequestParam("_fileName") String _fileName) {
+		log.debug("|"+name()+"|Security Vulnerable: Request to Read File "+_fileName);
+		try {
+			// Concatenating filename directly into command
+			Process process = Runtime.getRuntime().exec("cat " + _fileName);
+			// Rest of the code to read the process's output
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return ResponseEntity.ok("File content");
+	}
+
  }
