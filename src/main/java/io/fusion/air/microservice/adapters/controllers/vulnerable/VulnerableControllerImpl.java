@@ -220,7 +220,7 @@ public class VulnerableControllerImpl extends AbstractController {
 		log.debug("|"+name()+"|Security Vulnerable: Request to Read File "+_fileName);
 		try {
 			// Concatenating filename directly into command
-			Process process = Runtime.getRuntime().exec("cat " + _fileName);
+			// Process process = Runtime.getRuntime().exec("cat " + _fileName);
 			// Rest of the code to read the process's output
 		} catch (Exception e) {
 			e.printStackTrace();
