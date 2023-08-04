@@ -344,7 +344,7 @@ public class FixedControllerImpl extends AbstractController {
 					description = "Cart Retrieved!",
 					content = {@Content(mediaType = "application/json")}),
 			@ApiResponse(responseCode = "400",
-					description = "Invalid Cart ID",
+					description = "Invalid Customer ID",
 					content = @Content)
 	})
 	@GetMapping("/cart/customer/{customerId}")
