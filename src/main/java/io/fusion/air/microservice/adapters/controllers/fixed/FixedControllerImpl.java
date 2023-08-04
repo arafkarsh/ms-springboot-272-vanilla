@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 package io.fusion.air.microservice.adapters.controllers.fixed;
-
 // Custom
+import io.fusion.air.microservice.adapters.security.AuthorizationRequired;
+import io.fusion.air.microservice.adapters.security.SingleTokenAuthorizationRequired;
 import io.fusion.air.microservice.domain.entities.order.CartEntity;
 import io.fusion.air.microservice.domain.entities.order.ProductEntity;
 import io.fusion.air.microservice.domain.exceptions.DataNotFoundException;
@@ -325,6 +326,41 @@ public class FixedControllerImpl extends AbstractController {
 			throw new IllegalArgumentException("Invalid characters in patient name");
 		}
 		response.addHeader("Set-Cookie", "patient=" + patientName);
+	}
+
+	/**
+	 * Parameter Manipulation Vulnerability
+	 * Parameter Manipulation is an attack where an attacker alters parameters sent between the client and the
+	 * server to gain unauthorized access to data or perform actions they aren't permitted to perform.
+	 *
+	 * GET Method Call to Get Cart for the Customer
+	 * @return
+	 */
+	@SingleTokenAuthorizationRequired(role = "User")
+	@Operation(summary = "Get The Cart for the Customer")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					description = "Cart Retrieved!",
+					content = {@Content(mediaType = "application/json")}),
+			@ApiResponse(responseCode = "400",
+					description = "Invalid Cart ID",
+					content = @Content)
+	})
+	@GetMapping("/customer/{customerId}")
+	@ResponseBody
+	public ResponseEntity<StandardResponse> fetchCart(@PathVariable("customerId") String customerId) throws Exception {
+		if(customerId == null || customerId.isEmpty()) {
+			throw new DataNotFoundException("Invalid Customer ID "+customerId);
+		}
+		if(!customerId.equalsIgnoreCase(super.getClaims().getSubject())) {
+			log.info("|"+name()+"|Security breach: Un-Authorised Access: "+customerId);
+			throw new SecurityException("Security Exception: Access Denied for "+customerId);
+		}
+		log.debug("|"+name()+"|Request to Get Cart For the Customer "+customerId);
+		List<CartEntity> cart = cartService.findByCustomerId(customerId);
+		StandardResponse stdResponse = createSuccessResponse("Cart Retrieved. Items =  "+cart.size());
+		stdResponse.setPayload(cart);
+		return ResponseEntity.ok(stdResponse);
 	}
 
  }
