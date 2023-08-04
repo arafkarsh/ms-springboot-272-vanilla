@@ -47,6 +47,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.RequestScope;
 import org.springframework.web.util.HtmlUtils;
 // Java
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.*;
@@ -82,13 +84,13 @@ public class FixedControllerImpl extends AbstractController {
 	private String serviceName;
 
 	@Autowired
-	private CountryService countryService;
-
-	@Autowired
 	private ProductService productServiceImpl;
 
 	@Autowired
 	private CartService cartService;
+
+	@Autowired
+	private EntityManager entityManager;
 
 	/**
 	 * Cross-Site Scripting (XSS) Vulnerability
@@ -347,7 +349,7 @@ public class FixedControllerImpl extends AbstractController {
 					description = "Invalid Customer ID",
 					content = @Content)
 	})
-	@GetMapping("/cart/customer/{customerId}")
+	@GetMapping("/cart/parameter/customer/{customerId}")
 	@ResponseBody
 	public ResponseEntity<StandardResponse> fetchCart(@PathVariable("customerId") String customerId) throws Exception {
 		if(customerId == null || customerId.isEmpty()) {
@@ -359,6 +361,36 @@ public class FixedControllerImpl extends AbstractController {
 		}
 		log.debug("|"+name()+"|Request to Get Cart For the Customer "+customerId);
 		List<CartEntity> cart = cartService.findByCustomerId(customerId);
+		StandardResponse stdResponse = createSuccessResponse("Cart Retrieved. Items =  "+cart.size());
+		stdResponse.setPayload(cart);
+		return ResponseEntity.ok(stdResponse);
+	}
+
+	/**
+	 * SQL Injection is one of the most common and dangerous web application vulnerabilities. It occurs when an
+	 * attacker can inject arbitrary SQL code into a query, which is then executed by the database. This can lead
+	 * to various malicious outcomes, including unauthorized viewing of data, corrupting or deleting data, and in
+	 * some cases, even complete control over the host machine.
+	 *
+	 * GET Method Call to Get Cart for the Customer
+	 * @param customerId
+	 * @return
+	 */
+	@Operation(summary = "Get The Cart for the Customer")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					description = "Cart Retrieved!",
+					content = {@Content(mediaType = "application/json")}),
+			@ApiResponse(responseCode = "400",
+					description = "Invalid Customer ID",
+					content = @Content)
+	})
+	@GetMapping("/cart/sql/customer/{customerId}")
+	public ResponseEntity<StandardResponse> fetchCartSQLi(@PathVariable("customerId") String customerId) {
+		// Introducing SQL Injection Vulnerability Fixed
+		TypedQuery<CartEntity> query = entityManager.createQuery("SELECT c FROM CartEntity c WHERE c.customerId = :customerId",  CartEntity.class);
+		query.setParameter("customerId", customerId);
+		List<CartEntity> cart = query.getResultList();
 		StandardResponse stdResponse = createSuccessResponse("Cart Retrieved. Items =  "+cart.size());
 		stdResponse.setPayload(cart);
 		return ResponseEntity.ok(stdResponse);
