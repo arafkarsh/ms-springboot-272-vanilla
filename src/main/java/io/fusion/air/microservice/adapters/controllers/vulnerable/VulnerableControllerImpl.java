@@ -270,7 +270,7 @@ public class VulnerableControllerImpl extends AbstractController {
 					description = "Invalid Cart ID",
 					content = @Content)
 	})
-	@GetMapping("/customer/{customerId}")
+	@GetMapping("/cart/customer/{customerId}")
 	@ResponseBody
 	public ResponseEntity<StandardResponse> fetchCart(@PathVariable("customerId") String customerId) throws Exception {
 		log.debug("|"+name()+"|Request to Get Cart For the Customer "+customerId);

@@ -33,6 +33,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 // Spring Annotations
 import org.springframework.beans.factory.annotation.Autowired;
@@ -337,7 +338,7 @@ public class FixedControllerImpl extends AbstractController {
 	 * @return
 	 */
 	@SingleTokenAuthorizationRequired(role = "User")
-	@Operation(summary = "Get The Cart for the Customer")
+	@Operation(summary = "Get The Cart for the Customer", security = { @SecurityRequirement(name = "bearer-key") })
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200",
 					description = "Cart Retrieved!",
@@ -346,7 +347,7 @@ public class FixedControllerImpl extends AbstractController {
 					description = "Invalid Cart ID",
 					content = @Content)
 	})
-	@GetMapping("/customer/{customerId}")
+	@GetMapping("/cart/customer/{customerId}")
 	@ResponseBody
 	public ResponseEntity<StandardResponse> fetchCart(@PathVariable("customerId") String customerId) throws Exception {
 		if(customerId == null || customerId.isEmpty()) {
