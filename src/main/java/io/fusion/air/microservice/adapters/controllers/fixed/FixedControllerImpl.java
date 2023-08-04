@@ -45,6 +45,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.RequestScope;
 import org.springframework.web.util.HtmlUtils;
 // Java
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.*;
 import java.math.BigDecimal;
@@ -56,7 +57,7 @@ import static java.lang.invoke.MethodHandles.lookup;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
- * Country Controller for the Service
+ * Code with Vulnerabilities Fixed
  *
  * @author arafkarsh
  * @version 1.0
@@ -87,9 +88,8 @@ public class FixedControllerImpl extends AbstractController {
 	@Autowired
 	private CartService cartService;
 
-
-
 	/**
+	 * Cross-Site Scripting (XSS) Vulnerability
 	 * Cross-Site Scripting (XSS) attacks occur
 	 * - when an attacker uses a web application to send the malicious script,
 	 * - Generally in the form of a browser-side script to a different end user.
@@ -130,6 +130,7 @@ public class FixedControllerImpl extends AbstractController {
 	}
 
 	/**
+	 * Cross-Site Scripting (XSS) Vulnerability
 	 * Cross-Site Scripting (XSS) attacks occur
 	 * - when an attacker uses a web application to send the malicious script,
 	 * - Generally in the form of a browser-side script to a different end user.
@@ -170,6 +171,7 @@ public class FixedControllerImpl extends AbstractController {
 	}
 
 	/**
+	 * Cross-Site Scripting (XSS) Vulnerability
 	 * Cross-Site Scripting (XSS) attacks occur
 	 * - when an attacker uses a web application to send the malicious script,
 	 * - Generally in the form of a browser-side script to a different end user.
@@ -201,6 +203,7 @@ public class FixedControllerImpl extends AbstractController {
 	}
 
 	/**
+	 * Directory traversal Vulnerability
 	 * Directory traversal attacks involve exploiting insufficient security validation / sanitization of user-supplied
 	 * input file names, so that characters representing "traverse to parent directory" are passed through to the file
 	 * APIs. This could potentially allow the attacker to read or write files outside of the intended directory.
@@ -224,9 +227,9 @@ public class FixedControllerImpl extends AbstractController {
 	@GetMapping("/readFile")
 	public ResponseEntity<InputStreamResource> readFile(@RequestParam("_fileName") String _fileName) {
 		log.debug("|"+name()+"|Security Fixed: Request to Read File "+_fileName);
-		String cleanPath = StringUtils.cleanPath(_fileName);
 
 		// Check For Directory Traversal Attack
+		String cleanPath = StringUtils.cleanPath(_fileName);
 		if (cleanPath.contains("..")) {
 			// Reject the request
 			throw new DataNotFoundException("Invalid path for File: "+_fileName);
@@ -244,6 +247,7 @@ public class FixedControllerImpl extends AbstractController {
 	}
 
 	/**
+	 * Command Injection Vulnerability
 	 * Command Injection Vulnerability, also known as Shell Injection or OS Command Injection, is a type of injection
 	 * vulnerability where an attacker is able to execute arbitrary commands on the host operating system through a
 	 * vulnerable application. This kind of vulnerability arises when input provided by the user is improperly sanitized
@@ -265,14 +269,17 @@ public class FixedControllerImpl extends AbstractController {
 	public ResponseEntity<String> commandExecute(@RequestParam("_fileName") String _fileName) {
 		log.debug("|"+name()+"|Security Fixed: Request to Read File using CMD "+_fileName);
 		try {
-			// Fix the File Vulnerability (Directory Traversal Attack)
 			// Check For Directory Traversal Attack
-			if (_fileName.contains("..")) {
+			String cleanPath = StringUtils.cleanPath(_fileName);
+			if (cleanPath.contains("..")) {
 				// Reject the request
 				throw new DataNotFoundException("Invalid path for File: "+_fileName);
 			}
-			// Using ProcessBuilder to safely pass filename as an argument
-			ProcessBuilder builder = new ProcessBuilder("cat", _fileName);
+			// Read Data From a Specific Location
+			ClassPathResource dataFile = new ClassPathResource("static/files/" + _fileName);
+			log.info("Sanitized File Name: "+dataFile.getFilename());
+			// Using ProcessBuilder to avoid Shell Injection and safely pass filename as an argument
+			ProcessBuilder builder = new ProcessBuilder("cat", dataFile.getFilename());
 			Process process = builder.start();
 			// Rest of the code to read the process's output
 			return ResponseEntity.ok(readData(process));
@@ -299,6 +306,25 @@ public class FixedControllerImpl extends AbstractController {
 			}
 			return "No Data Available";
 		}
+	}
+
+	/**
+	 * HTTP Response Splitting Vulnerability
+	 * HTTP Response Splitting is an attack that takes advantage of the way HTTP headers are processed. By injecting
+	 * newline characters into HTTP header values, an attacker can create additional HTTP headers and even completely
+	 * separate HTTP responses, thereby manipulating the HTTP process on the client-side.
+	 *
+	 * Set the Cookie with Patient's Name
+	 *
+	 * @param response
+	 * @param patientName
+	 */
+	public void setPatientCookie(HttpServletResponse response, String patientName) {
+		// Ensure patientName doesn't contain newline characters
+		if (patientName.matches("[\\r\\n]")) {
+			throw new IllegalArgumentException("Invalid characters in patient name");
+		}
+		response.addHeader("Set-Cookie", "patient=" + patientName);
 	}
 
  }

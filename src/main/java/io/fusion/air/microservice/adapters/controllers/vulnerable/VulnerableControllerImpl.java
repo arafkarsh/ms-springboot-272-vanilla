@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 package io.fusion.air.microservice.adapters.controllers.vulnerable;
-
+// Custom
 import io.fusion.air.microservice.domain.entities.order.ProductEntity;
 import io.fusion.air.microservice.domain.exceptions.DataNotFoundException;
 import io.fusion.air.microservice.domain.models.core.StandardResponse;
@@ -22,32 +22,35 @@ import io.fusion.air.microservice.domain.ports.services.CountryService;
 import io.fusion.air.microservice.domain.ports.services.ProductService;
 import io.fusion.air.microservice.server.config.ServiceConfiguration;
 import io.fusion.air.microservice.server.controllers.AbstractController;
+// Swagger API
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.slf4j.Logger;
+// Spring
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.RequestScope;
-
-import javax.validation.Valid;
+// Java
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.math.BigDecimal;
 import java.util.List;
-
+// SLF4J
+import org.slf4j.Logger;
 import static java.lang.invoke.MethodHandles.lookup;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
- * Country Controller for the Service
+ * Code with Vulnerabilities
+ * Checkout FixedControllerImpl for the Fixed Code for the vulnerabilities mentioned in this code.
  *
  * @author arafkarsh
  * @version 1.0
- * 
+ * @See FixedControllerImpl
  */
 @CrossOrigin
 @Configuration
@@ -71,8 +74,8 @@ public class VulnerableControllerImpl extends AbstractController {
 	@Autowired
 	private ProductService productServiceImpl;
 
-
 	/**
+	 * Cross-Site Scripting (XSS) Vulnerability
 	 * Cross-Site Scripting (XSS) attacks occur
 	 * - when an attacker uses a web application to send the malicious script,
 	 * - Generally in the form of a browser-side script to a different end user.
@@ -111,6 +114,7 @@ public class VulnerableControllerImpl extends AbstractController {
 	}
 
 	/**
+	 * Cross-Site Scripting (XSS) Vulnerability
 	 * Cross-Site Scripting (XSS) attacks occur
 	 * - when an attacker uses a web application to send the malicious script,
 	 * - Generally in the form of a browser-side script to a different end user.
@@ -142,8 +146,8 @@ public class VulnerableControllerImpl extends AbstractController {
 		return ResponseEntity.ok(stdResponse);
 	}
 
-
 	/**
+	 * Directory Traversal Vulnerability
 	 * Directory traversal attacks involve exploiting insufficient security validation / sanitization of user-supplied
 	 * input file names, so that characters representing "traverse to parent directory" are passed through to the file
 	 * APIs. This could potentially allow the attacker to read or write files outside of the intended directory.
@@ -198,6 +202,7 @@ public class VulnerableControllerImpl extends AbstractController {
 	}
 
 	/**
+	 * Command Injection Vulnerability
 	 * Command Injection Vulnerability, also known as Shell Injection or OS Command Injection, is a type of injection
 	 * vulnerability where an attacker is able to execute arbitrary commands on the host operating system through a
 	 * vulnerable application. This kind of vulnerability arises when input provided by the user is improperly sanitized
@@ -226,6 +231,21 @@ public class VulnerableControllerImpl extends AbstractController {
 			e.printStackTrace();
 		}
 		return ResponseEntity.ok("File content");
+	}
+
+	/**
+	 * HTTP Response Splitting Vulnerability
+	 * HTTP Response Splitting is an attack that takes advantage of the way HTTP headers are processed. By injecting
+	 * newline characters into HTTP header values, an attacker can create additional HTTP headers and even completely
+	 * separate HTTP responses, thereby manipulating the HTTP process on the client-side.
+	 *
+	 * Set the Cookie with Patient's Name
+	 *
+	 * @param response
+	 * @param patientName
+	 */
+	public void setPatientCookie(HttpServletResponse response, String patientName) {
+		response.addHeader("Set-Cookie", "patient=" + patientName);
 	}
 
  }
