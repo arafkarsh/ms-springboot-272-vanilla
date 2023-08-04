@@ -41,8 +41,8 @@ CREATE TABLE ms_schema.carts_tx (
     updatedtime timestamp(6) without time zone NOT NULL,
     isactive boolean,
     version integer,
-    customerid character varying(40) NOT NULL,
-    productid character varying(40) NOT NULL,
+    customerid character varying(255) NOT NULL,
+    productid character varying(255) NOT NULL,
     productname character varying(32),
     price numeric(38,2) NOT NULL,
     quantity numeric(38,2) NOT NULL
@@ -363,13 +363,13 @@ ALTER TABLE ms_schema.reservation_tx OWNER TO postgres;
 --
 
 COPY ms_schema.carts_tx (uuid, createdby, createdtime, updatedby, updatedtime, isactive, version, customerid, productid, productname, price, quantity) FROM stdin;
-22273a09-ee9e-4e5a-98fa-6bcfcfa97b49	john.doe	2023-05-28 20:26:12.919	john.doe	2023-05-28 20:26:12.919	t	0	jane.doe	789	Pencil	10.00	3.00
-7b54e398-711a-4820-a32c-81c7dfab1ab1	john.doe	2023-05-28 20:26:12.919	john.doe	2023-05-28 20:26:12.919	t	0	jane.doe	678	Pen	30.00	2.00
-b1edfc2d-a907-4806-b51f-28c7bd3cdd3f	john.doe	2023-05-28 20:26:12.919	john.doe	2023-05-28 20:26:12.919	t	0	jane.doe	902	Paper 100 Bundle	50.00	5.00
-bbef5710-e7ba-4bc9-9c01-353dbd82dd6e	john.doe	2023-05-28 20:26:12.919	john.doe	2023-05-28 20:26:12.919	t	0	jane.doe	902	Book Lined	30.00	3.00
-a43e9fd2-a3bd-4281-91e9-96f5e130f032	anonymousUser	2023-07-02 10:30:12.991269	anonymousUser	2023-07-02 10:30:12.991269	t	0	john.doe	1542	Lunch Box	35.00	1.00
-faca053a-b4af-4a31-aa15-bf2dbf2102e1	anonymousUser	2023-07-02 10:30:53.952645	anonymousUser	2023-07-02 10:30:53.952645	t	0	john.doe	1543	School Bag	45.00	1.00
-f9e9c861-e48c-4485-ac7d-5f6c29beeb37	anonymousUser	2023-07-02 10:35:50.113237	anonymousUser	2023-07-02 10:35:50.113237	t	0	john.doe	1544	Umbrella	32.00	1.00
+22273a09-ee9e-4e5a-98fa-6bcfcfa97b49	john.doe	2023-05-28 20:26:12.919	john.doe	2023-05-28 20:26:12.919	t	0	123	789	Pencil	10.00	3.00
+7b54e398-711a-4820-a32c-81c7dfab1ab1	john.doe	2023-05-28 20:26:12.919	john.doe	2023-05-28 20:26:12.919	t	0	123	678	Pen	30.00	2.00
+b1edfc2d-a907-4806-b51f-28c7bd3cdd3f	john.doe	2023-05-28 20:26:12.919	john.doe	2023-05-28 20:26:12.919	t	0	123	902	Paper 100 Bundle	50.00	5.00
+bbef5710-e7ba-4bc9-9c01-353dbd82dd6e	john.doe	2023-05-28 20:26:12.919	john.doe	2023-05-28 20:26:12.919	t	0	123	902	Book Lined	30.00	3.00
+a43e9fd2-a3bd-4281-91e9-96f5e130f032	anonymousUser	2023-07-02 10:30:12.991269	anonymousUser	2023-07-02 10:30:12.991269	t	0	123	1542	Lunch Box	35.00	1.00
+faca053a-b4af-4a31-aa15-bf2dbf2102e1	anonymousUser	2023-07-02 10:30:53.952645	anonymousUser	2023-07-02 10:30:53.952645	t	0	123	1543	School Bag	45.00	1.00
+f9e9c861-e48c-4485-ac7d-5f6c29beeb37	anonymousUser	2023-07-02 10:35:50.113237	anonymousUser	2023-07-02 10:35:50.113237	t	0	123	1544	Umbrella	32.00	1.00
 \.
 
 
