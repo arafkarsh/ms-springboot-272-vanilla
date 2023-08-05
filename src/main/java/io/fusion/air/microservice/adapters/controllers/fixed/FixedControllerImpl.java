@@ -40,6 +40,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.RequestScope;
@@ -439,6 +440,43 @@ public class FixedControllerImpl extends AbstractController {
 		List<CartEntity> cart = query.getResultList();
 		StandardResponse stdResponse = createSuccessResponse("Cart Retrieved. Items =  "+cart.size());
 		stdResponse.setPayload(cart);
+		return ResponseEntity.ok(stdResponse);
+	}
+
+	/**
+	 * Out-of-Band SQL Injection
+	 * In Out-of-Band SQL Injection, the attacker is unable to use the same channel to launch the attack and gather
+	 * results and must use different means to receive the response, such as DNS requests or HTTP requests to an
+	 * attacker-controlled server.
+	 *
+	 * Example: Exploiting via Database Notification Functionality
+	 * Imagine an application that uses a query to send email notifications based on user input:
+	 *
+	 * Exploit
+	 * jane.doe' OR '1'='1
+	 *
+	 * GET Method Call to Get Cart for the Customer
+	 * @param customerId
+	 * @return
+	 */
+	@Operation(summary = "SQL Injection Vulnerability OUT-Band: Executing Stored Procedure.")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					description = "Cart Retrieved!",
+					content = {@Content(mediaType = "application/json")}),
+			@ApiResponse(responseCode = "400",
+					description = "Invalid Customer ID",
+					content = @Content)
+	})
+	@GetMapping("/sql/injection/outband/cart/customer/{customerId}")
+	@Transactional
+	public ResponseEntity<StandardResponse> sqlOutBandTest(@PathVariable("customerId") String customerId) {
+		// SQL Injection Vulnerability Fixed
+		Query query = entityManager.createNativeQuery("SELECT ms_schema.sendNotificationFunc(?)");
+		query.setParameter(1, customerId);
+		Object result = query.getSingleResult();
+
+		StandardResponse stdResponse = createSuccessResponse("Stored Procedure executed: Result = "+result);
 		return ResponseEntity.ok(stdResponse);
 	}
 

@@ -25,40 +25,6 @@ CREATE SCHEMA ms_schema;
 
 ALTER SCHEMA ms_schema OWNER TO arafkarsh;
 
---
--- Name: sendnotification(text); Type: PROCEDURE; Schema: ms_schema; Owner: arafkarsh
---
-
-CREATE PROCEDURE ms_schema.sendnotification(IN customer_id text, OUT message text)
-    LANGUAGE plpgsql
-    AS $$
-BEGIN
-  -- logic here
-  message := 'Notification sent to ' || customer_id;
-END;
-$$;
-
-
-ALTER PROCEDURE ms_schema.sendnotification(IN customer_id text, OUT message text) OWNER TO arafkarsh;
-
---
--- Name: sendnotificationfunc(text); Type: FUNCTION; Schema: ms_schema; Owner: arafkarsh
---
-
-CREATE FUNCTION ms_schema.sendnotificationfunc(customer_id text) RETURNS text
-    LANGUAGE plpgsql
-    AS $$
-DECLARE
-  message text;
-BEGIN
-  message := 'PostgreSQL:sendNotificationFunc: Notification sent to ' || customer_id;
-  RETURN message;
-END;
-$$;
-
-
-ALTER FUNCTION ms_schema.sendnotificationfunc(customer_id text) OWNER TO arafkarsh;
-
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
@@ -116,19 +82,6 @@ CREATE TABLE ms_schema.country_t (
 
 
 ALTER TABLE ms_schema.country_t OWNER TO arafkarsh;
-
---
--- Name: critical_table_tx; Type: TABLE; Schema: ms_schema; Owner: postgres
---
-
-CREATE TABLE ms_schema.critical_table_tx (
-    pkey character varying NOT NULL,
-    userid character varying NOT NULL,
-    isactive boolean DEFAULT true NOT NULL
-);
-
-
-ALTER TABLE ms_schema.critical_table_tx OWNER TO postgres;
 
 --
 -- Name: order_item_tx; Type: TABLE; Schema: ms_schema; Owner: postgres
@@ -415,8 +368,8 @@ COPY ms_schema.carts_tx (uuid, createdby, createdtime, updatedby, updatedtime, i
 b1edfc2d-a907-4806-b51f-28c7bd3cdd3f	john.doe	2023-05-28 20:26:12.919	john.doe	2023-05-28 20:26:12.919	t	0	jane.doe	902	Paper 100 Bundle	50.00	5.00
 bbef5710-e7ba-4bc9-9c01-353dbd82dd6e	john.doe	2023-05-28 20:26:12.919	john.doe	2023-05-28 20:26:12.919	t	0	jane.doe	902	Book Lined	30.00	3.00
 a43e9fd2-a3bd-4281-91e9-96f5e130f032	anonymousUser	2023-07-02 10:30:12.991269	anonymousUser	2023-07-02 10:30:12.991269	t	0	john.doe	1542	Lunch Box	35.00	1.00
+faca053a-b4af-4a31-aa15-bf2dbf2102e1	anonymousUser	2023-07-02 10:30:53.952645	anonymousUser	2023-07-02 10:30:53.952645	t	0	john.doe	1543	School Bag	45.00	1.00
 f9e9c861-e48c-4485-ac7d-5f6c29beeb37	anonymousUser	2023-07-02 10:35:50.113237	anonymousUser	2023-07-02 10:35:50.113237	t	0	john.doe	1544	Umbrella	32.00	1.00
-faca053a-b4af-4a31-aa15-bf2dbf2102e1	anonymousUser	2023-07-02 10:30:53.952645	anonymousUser	2023-08-05 13:51:09.563412	t	2	john.doe	1543	School Bag	45.00	1.00
 \.
 
 
@@ -708,16 +661,6 @@ COPY ms_schema.country_t (cid, countryid, countrycode, countryname, countryoffic
 23	862	VEN	Venezuela	Bolivarin Republic of Venezuela
 4	111	ITA	Italy	Italy
 5	356	IND	India	Republic of India
-\.
-
-
---
--- Data for Name: critical_table_tx; Type: TABLE DATA; Schema: ms_schema; Owner: postgres
---
-
-COPY ms_schema.critical_table_tx (pkey, userid, isactive) FROM stdin;
-abc1001	jane.doe	t
-abc1002	john.doe	t
 \.
 
 

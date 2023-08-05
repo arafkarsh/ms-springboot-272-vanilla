@@ -33,6 +33,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.RequestScope;
 // Java
@@ -350,6 +351,46 @@ public class VulnerableControllerImpl extends AbstractController {
 		List<CartEntity> cart = query.getResultList();
 		StandardResponse stdResponse = createSuccessResponse("Cart Retrieved. Items =  "+cart.size());
 		stdResponse.setPayload(cart);
+		return ResponseEntity.ok(stdResponse);
+	}
+
+	/**
+	 * Out-of-Band SQL Injection
+	 * In Out-of-Band SQL Injection, the attacker is unable to use the same channel to launch the attack and gather
+	 * results and must use different means to receive the response, such as DNS requests or HTTP requests to an
+	 * attacker-controlled server.
+	 *
+	 * Example: Exploiting via Database Notification Functionality
+	 * Imagine an application that uses a query to send email notifications based on user input:
+	 *
+	 * Exploit
+	 * jane.doe' OR '1'='1
+	 *
+	 * GET Method Call to Get Cart for the Customer
+	 * @param customerId
+	 * @return
+	 */
+	@Operation(summary = "SQL Injection Vulnerability OUT-Band: Executing Stored Procedure.")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					description = "Cart Retrieved!",
+					content = {@Content(mediaType = "application/json")}),
+			@ApiResponse(responseCode = "400",
+					description = "Invalid Customer ID",
+					content = @Content)
+	})
+	@GetMapping("/sql/injection/outband/cart/customer/{customerId}")
+	public ResponseEntity<StandardResponse> sqlOutBandTest(@PathVariable("customerId") String customerId) {
+		// SQL Injection Vulnerability by directly concatenating the input
+		Object result = "No Data Found!";
+		try {
+			Query query = entityManager.createNativeQuery("SELECT ms_schema.sendNotificationFunc('" + customerId + "')");
+			result = query.getSingleResult();
+		} catch (Exception e) {
+			log.error("|"+name()+"|Error Occurred: "+e.getMessage());
+		}
+
+		StandardResponse stdResponse = createSuccessResponse("Stored Procedure executed: Result = "+result);
 		return ResponseEntity.ok(stdResponse);
 	}
 

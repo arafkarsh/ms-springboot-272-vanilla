@@ -470,7 +470,7 @@ public class ExceptionHandlerAdvice extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(value = PersistenceException.class)
     public ResponseEntity<Object> handlePersistenceException(PersistenceException _pEx, WebRequest _request) {
-        return createErrorResponse(_pEx,  "Unable to Save Data!", "458", _request);
+        return createErrorResponse(_pEx,  "Persistence Error: "+_pEx.getMessage(), "458", _request);
     }
 
     /**

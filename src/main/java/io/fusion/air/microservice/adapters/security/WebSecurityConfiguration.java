@@ -23,6 +23,8 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.firewall.DefaultHttpFirewall;
+import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.security.web.csrf.CsrfFilter;
@@ -123,13 +125,25 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     /**
      * Handles Malicious URI Path (handles special characters and other things
+     * Disabled the Bean for Testing SQL Injection and Http Response Splitting Attacks.
      * @return
      */
-    @Bean
+    // @Bean
     public StrictHttpFirewall httpFirewall() {
         StrictHttpFirewall firewall = new StrictHttpFirewall();
         firewall.setAllowedHttpMethods(Arrays.asList("GET","POST", "PUT", "DELETE"));
         return firewall;
+    }
+
+    /**
+     * Handles Malicious URI Path (handles special characters and other things
+     * Disabled the Bean for Testing SQL Injection and Http Response Splitting Attacks.
+     *
+     * @return
+     */
+    @Bean
+    public HttpFirewall defaultHttpFirewall() {
+        return new DefaultHttpFirewall();
     }
 
     /**
