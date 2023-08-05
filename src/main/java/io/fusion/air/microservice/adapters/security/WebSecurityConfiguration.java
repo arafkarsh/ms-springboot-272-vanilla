@@ -136,10 +136,12 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     /**
-     * Handles Malicious URI Path (handles special characters and other things
-     * Disabled the Bean for Testing SQL Injection and Http Response Splitting Attacks.
+     * Default HTTP Firewall should NOT be used. This ONLY for demo purposes.
+     * To Test the SQL Injection Vulnerabilities. This is NOT recommended for Production.
+     * Enable the httpFireWall() Bean for Production.
      *
      * @return
+     * @see httpFirewall()
      */
     @Bean
     public HttpFirewall defaultHttpFirewall() {

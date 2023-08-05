@@ -453,7 +453,7 @@ public class FixedControllerImpl extends AbstractController {
 	 * Imagine an application that uses a query to send email notifications based on user input:
 	 *
 	 * Exploit
-	 * jane.doe' OR '1'='1
+	 * jane.doe'; DROP TABLE ms_schema.critical_table_tx; --
 	 *
 	 * GET Method Call to Get Cart for the Customer
 	 * @param customerId
