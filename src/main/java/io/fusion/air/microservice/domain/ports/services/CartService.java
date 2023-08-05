@@ -87,4 +87,26 @@ public interface CartService {
      */
     public CartEntity save(Cart cart);
 
+    /**
+     * De Activate the Cart item
+     * @param _cartItem
+     * @return
+     */
+    public CartEntity deActivateCart(String _customerId, UUID _cartItem);
+
+    /**
+     * Activate the Cart item
+     * @param _customerId
+     * @param _cartItem
+     * @return
+     */
+    public CartEntity activateCart(String _customerId, UUID _cartItem);
+
+    /**
+     * Delete the Cart item (Permanently Deletes the Item)
+     * @param _customerId
+     * @param _cartItem
+     */
+    public void deleteCart(String _customerId, UUID _cartItem);
+
 }

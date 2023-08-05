@@ -37,6 +37,7 @@ import org.springframework.web.context.annotation.RequestScope;
 import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 // SLF4J
 import org.slf4j.Logger;
 import static java.lang.invoke.MethodHandles.lookup;
@@ -162,6 +163,71 @@ public class CartControllerImpl extends AbstractController {
 		CartEntity cartItem = cartService.save(_cart);
 		StandardResponse stdResponse = createSuccessResponse("Cart Item Added!");
 		stdResponse.setPayload(cartItem);
+		return ResponseEntity.ok(stdResponse);
+	}
+
+	/**
+	 * De-Activate the Cart Item
+	 */
+	@Operation(summary = "De-Activate Cart Item")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					description = "Cart Item De-Activated",
+					content = {@Content(mediaType = "application/json")}),
+			@ApiResponse(responseCode = "400",
+					description = "Unable to De-Activate the Cart item",
+					content = @Content)
+	})
+	@PutMapping("/deactivate/customer/{customerId}/cartitem/{cartid}")
+	public ResponseEntity<StandardResponse> deActivateCartItem(@PathVariable("customerId") String customerId,
+									@PathVariable("cartid") UUID _cartid) {
+		log.debug("|"+name()+"|Request to De-Activate the Cart item... "+_cartid);
+		CartEntity product = cartService.deActivateCart(customerId, _cartid);
+		StandardResponse stdResponse = createSuccessResponse("Cart Item De-Activated");
+		stdResponse.setPayload(product);
+		return ResponseEntity.ok(stdResponse);
+	}
+
+	/**
+	 * Activate the Cart Item
+	 */
+	@Operation(summary = "Activate Cart Item")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					description = "Cart Item Activated",
+					content = {@Content(mediaType = "application/json")}),
+			@ApiResponse(responseCode = "400",
+					description = "Unable to Activate the Cart item",
+					content = @Content)
+	})
+	@PutMapping("/activate/customer/{customerId}/cartitem/{cartid}")
+	public ResponseEntity<StandardResponse> activateCartItem(@PathVariable("customerId") String customerId,
+															   @PathVariable("cartid") UUID _cartid) {
+		log.debug("|"+name()+"|Request to Activate the Cart item... "+_cartid);
+		CartEntity product = cartService.activateCart(customerId, _cartid);
+		StandardResponse stdResponse = createSuccessResponse("Cart Item Activated");
+		stdResponse.setPayload(product);
+		return ResponseEntity.ok(stdResponse);
+	}
+
+	/**
+	 * Delete the Cart Item
+	 */
+	@Operation(summary = "Delete Cart Item")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					description = "Cart Item Deleted",
+					content = {@Content(mediaType = "application/json")}),
+			@ApiResponse(responseCode = "400",
+					description = "Unable to Delete the Cart item",
+					content = @Content)
+	})
+	@DeleteMapping("/delete/customer/{customerId}/cartitem/{cartid}")
+	public ResponseEntity<StandardResponse> deleteCartItem(@PathVariable("customerId") String customerId,
+															 @PathVariable("cartid") UUID _cartid) {
+		log.debug("|"+name()+"|Request to Delete the Cart item... "+_cartid);
+		cartService.deleteCart(customerId, _cartid);
+		StandardResponse stdResponse = createSuccessResponse("Cart Item Deleted");
 		return ResponseEntity.ok(stdResponse);
 	}
 

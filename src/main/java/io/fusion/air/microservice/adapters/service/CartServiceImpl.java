@@ -17,6 +17,8 @@ package io.fusion.air.microservice.adapters.service;
 
 import io.fusion.air.microservice.adapters.repository.CartRepository;
 import io.fusion.air.microservice.domain.entities.order.CartEntity;
+import io.fusion.air.microservice.domain.entities.order.ProductEntity;
+import io.fusion.air.microservice.domain.exceptions.DataNotFoundException;
 import io.fusion.air.microservice.domain.models.order.Cart;
 import io.fusion.air.microservice.domain.ports.services.CartService;
 import io.fusion.air.microservice.utils.Utils;
@@ -152,5 +154,52 @@ public class CartServiceImpl implements CartService {
     @Transactional
     public CartEntity save(Cart cart) {
         return cartRepository.save(new CartEntity(cart));
+    }
+
+    /**
+     * De Activate the Cart item
+     *
+     * @param _customerId
+     * @param _cartItem
+     * @return
+     */
+    @Override
+    public CartEntity deActivateCart(String _customerId, UUID _cartItem) {
+        Optional<CartEntity> cartItem = findById(_cartItem,_customerId);
+        if(cartItem.isPresent()) {
+            cartItem.get().deActivate();
+            cartRepository.saveAndFlush(cartItem.get());
+            return cartItem.get();
+        }
+        throw new DataNotFoundException("Cart Item Not Found");
+    }
+
+    /**
+     * Activate the Cart item
+     * @param _customerId
+     * @param _cartItem
+     * @return
+     */
+    @Override
+    public CartEntity activateCart(String _customerId, UUID _cartItem) {
+        Optional<CartEntity> cartItem = findById(_cartItem,_customerId);
+        if(cartItem.isPresent()) {
+            cartItem.get().activate();
+            cartRepository.saveAndFlush(cartItem.get());
+            return cartItem.get();
+        }
+        throw new DataNotFoundException("Cart Item Not Found");    }
+
+    /**
+     * Delete the Cart item (Permanently Deletes the Item)
+     * @param _customerId
+     * @param _cartItem
+     */
+    @Override
+    public void deleteCart(String _customerId, UUID _cartItem) {
+        Optional<CartEntity> cartItem = findById(_cartItem,_customerId);
+        if(cartItem.isPresent()) {
+            cartRepository.delete(cartItem.get());
+        }
     }
 }
