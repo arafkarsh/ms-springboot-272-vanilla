@@ -71,7 +71,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 // "/ms-cache/api/v1"
 @RequestMapping("${service.api.path}/security/fixed")
 @RequestScope
-@Tag(name = "Security Vulnerability Fixed", description = "XSS, SQL Injection, CSRF, Shell Injection etc.")
+@Tag(name = "Security Vulnerability Fixed", description = "XSS, Input Validation, Buffer Overflow, SQL Injection, CSRF, Shell Injection, Directory Traversal, Http Response Splitting etc.")
 public class FixedControllerImpl extends AbstractController {
 
 	// Set Logger -> Lookup will automatically determine the class name.
