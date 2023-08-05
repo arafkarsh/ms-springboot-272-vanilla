@@ -164,7 +164,7 @@ public class CartServiceImpl implements CartService {
      * @return
      */
     @Override
-    public CartEntity deActivateCart(String _customerId, UUID _cartItem) {
+    public CartEntity deActivateCartItem(String _customerId, UUID _cartItem) {
         Optional<CartEntity> cartItem = findById(_cartItem,_customerId);
         if(cartItem.isPresent()) {
             cartItem.get().deActivate();
@@ -181,7 +181,7 @@ public class CartServiceImpl implements CartService {
      * @return
      */
     @Override
-    public CartEntity activateCart(String _customerId, UUID _cartItem) {
+    public CartEntity activateCartItem(String _customerId, UUID _cartItem) {
         Optional<CartEntity> cartItem = findById(_cartItem,_customerId);
         if(cartItem.isPresent()) {
             cartItem.get().activate();
@@ -196,7 +196,7 @@ public class CartServiceImpl implements CartService {
      * @param _cartItem
      */
     @Override
-    public void deleteCart(String _customerId, UUID _cartItem) {
+    public void deleteCartItem(String _customerId, UUID _cartItem) {
         Optional<CartEntity> cartItem = findById(_cartItem,_customerId);
         if(cartItem.isPresent()) {
             cartRepository.delete(cartItem.get());

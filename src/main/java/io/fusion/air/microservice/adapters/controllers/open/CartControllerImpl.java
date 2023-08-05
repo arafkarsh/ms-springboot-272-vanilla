@@ -182,7 +182,7 @@ public class CartControllerImpl extends AbstractController {
 	public ResponseEntity<StandardResponse> deActivateCartItem(@PathVariable("customerId") String customerId,
 									@PathVariable("cartid") UUID _cartid) {
 		log.debug("|"+name()+"|Request to De-Activate the Cart item... "+_cartid);
-		CartEntity product = cartService.deActivateCart(customerId, _cartid);
+		CartEntity product = cartService.deActivateCartItem(customerId, _cartid);
 		StandardResponse stdResponse = createSuccessResponse("Cart Item De-Activated");
 		stdResponse.setPayload(product);
 		return ResponseEntity.ok(stdResponse);
@@ -204,7 +204,7 @@ public class CartControllerImpl extends AbstractController {
 	public ResponseEntity<StandardResponse> activateCartItem(@PathVariable("customerId") String customerId,
 															   @PathVariable("cartid") UUID _cartid) {
 		log.debug("|"+name()+"|Request to Activate the Cart item... "+_cartid);
-		CartEntity product = cartService.activateCart(customerId, _cartid);
+		CartEntity product = cartService.activateCartItem(customerId, _cartid);
 		StandardResponse stdResponse = createSuccessResponse("Cart Item Activated");
 		stdResponse.setPayload(product);
 		return ResponseEntity.ok(stdResponse);
@@ -226,7 +226,7 @@ public class CartControllerImpl extends AbstractController {
 	public ResponseEntity<StandardResponse> deleteCartItem(@PathVariable("customerId") String customerId,
 															 @PathVariable("cartid") UUID _cartid) {
 		log.debug("|"+name()+"|Request to Delete the Cart item... "+_cartid);
-		cartService.deleteCart(customerId, _cartid);
+		cartService.deleteCartItem(customerId, _cartid);
 		StandardResponse stdResponse = createSuccessResponse("Cart Item Deleted");
 		return ResponseEntity.ok(stdResponse);
 	}
