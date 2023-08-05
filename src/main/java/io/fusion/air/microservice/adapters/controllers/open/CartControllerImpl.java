@@ -55,7 +55,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 // "/ms-cache/api/v1"
 @RequestMapping("${service.api.path}/cart")
 @RequestScope
-@Tag(name = "Cart API", description = "To Manage (Add/Update/Delete/Search) Cart.(io.f.a.m.adapters.controllers.CartControllerImpl)")
+@Tag(name = "Cart API", description = "CRUD Operations for Cart, Cart Items")
 public class CartControllerImpl extends AbstractController {
 
 	// Set Logger -> Lookup will automatically determine the class name.

@@ -52,7 +52,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 // "/ms-cache/api/v1"
 @RequestMapping("${service.api.path}/order/process")
 @RequestScope
-@Tag(name = "Order Process API", description = "To Manage (Credits/Payments/Package/Shipment/Delivery/Cancellation) of Order.")
+@Tag(name = "Order Process API", description = "To Manage Credits / Payments / Package / Shipment / Delivery / Cancellation of Order.")
 public class OrderProcessControllerImpl extends AbstractController {
 
 	// Set Logger -> Lookup will automatically determine the class name.

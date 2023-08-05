@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.RequestScope;
 // Java / utils
 import org.slf4j.Logger;
-
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
@@ -54,7 +53,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 // "/ms-cache/api/v1"
 @RequestMapping("${service.api.path}/reservation")
 @RequestScope
-@Tag(name = "Reservation API", description = "To Manage Hotel/Rental/Flight booking.")
+@Tag(name = "Reservation API", description = "To Manage Hotel / Rental / Flight Bookings. Base for Saga Design Pattern Implementation")
 public class ReservationProcessControllerImpl extends AbstractController {
 
 	// Set Logger -> Lookup will automatically determine the class name.

@@ -58,7 +58,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 // "/ms-cache/api/v1"
 @RequestMapping("${service.api.path}/country")
 @RequestScope
-@Tag(name = "Country API", description = "To Manage (Add/Update/Delete/Search) Country.(io.f.a.m.adapters.controllers.CountrytControllerImpl)")
+@Tag(name = "Country API", description = "Spring Data Examples with Pagination")
 public class CountryControllerImpl extends AbstractController {
 
 	// Set Logger -> Lookup will automatically determine the class name.
