@@ -32,6 +32,7 @@ import org.springframework.http.HttpStatus;
 
 import io.fusion.air.microservice.domain.models.core.StandardResponse;
 import org.slf4j.MDC;
+import org.springframework.http.ResponseCookie;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -355,6 +356,7 @@ public final class Utils {
 	 * @param _value
 	 * @param _age
 	 * @return
+	 * @deprecated Use createCookie(String _key, String _value)
 	 */
 	public static Cookie createCookie(HttpServletRequest request, String _key, String _value, int _age) {
 		Cookie c = new Cookie(_key, _value);
@@ -364,6 +366,44 @@ public final class Utils {
 		c.setMaxAge(_age);
 		// c.setPath(request.getRequestURI());
 		return c;
+	}
+
+	/**
+	 * Create Secure Cookie
+	 * 
+	 * @param _key
+	 * @param _value
+	 * @return
+	 */
+	public static String createCookie(String _key, String _value) {
+		return createCookie("/", _key, _value, 3600);
+	}
+
+	/**
+	 * Create Secure Cookie
+	 *
+	 * @param _path
+	 * @param _key
+	 * @param _value
+	 * @param _age
+	 * @return
+	 */
+	public static String createCookie(String _path, String _key, String _value, int _age) {
+		if(_value == null || _value.isEmpty()) {
+			throw new IllegalArgumentException("Invalid Value for the Cookie: "+_value);
+		}
+		if (_value.matches("[\\r\\n]")) {
+			throw new IllegalArgumentException("Invalid characters For the Cookie Value: "+_value);
+		}
+		String path = (_path == null) ? "/" : _path;
+		ResponseCookie cookie = ResponseCookie.from(_key, _value)
+				.httpOnly(true)         // Protects against XSS attacks.
+				.secure(true)           // Cookie will only be sent over HTTPS, not with unsecured HTTP.
+				.path(path)             // Define the path for the cookie.
+				.maxAge(_age)    		// Expire the cookie after X mins.
+				.sameSite("Strict")     // Mitigate CSRF attacks by restricting the sending of the cookie to same-site requests only.
+				.build();
+		return cookie.toString();
 	}
 
 	/**
