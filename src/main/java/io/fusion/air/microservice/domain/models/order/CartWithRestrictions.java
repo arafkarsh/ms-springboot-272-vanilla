@@ -41,7 +41,7 @@ public class CartWithRestrictions {
     private String productId;
 
     @Size(min = 3, max = 64, message = "The length of Product Name must be 3-32 characters.")
-    @Pattern(regexp = "^[a-zA-Z0-9.-]{3,64}$", message = "Must contain only alphanumeric characters, dots, and dashes, between 3 to 32 characters.")
+    @Pattern(regexp = "^[a-zA-Z0-9.-]{3,64}$", message = "Must contain only alphanumeric characters, dots, and dashes, between 3 to 64 characters.")
     private String productName;
 
     @NotNull(message = "The Price is required.")
