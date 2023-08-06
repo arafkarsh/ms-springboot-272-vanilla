@@ -40,7 +40,7 @@ public class CartWithRestrictions {
     @Pattern(regexp = "^[a-zA-Z0-9.-]{3,32}$", message = "Must contain only alphanumeric characters, dots, and dashes, between 3 to 32 characters.")
     private String productId;
 
-    @Size(min = 3, max = 64, message = "The length of Product Name must be 3-32 characters.")
+    @Size(min = 3, max = 64, message = "The length of Product Name must be 3-64 characters.")
     @Pattern(regexp = "^[a-zA-Z0-9.-]{3,64}$", message = "Must contain only alphanumeric characters, dots, and dashes, between 3 to 64 characters.")
     private String productName;
 
