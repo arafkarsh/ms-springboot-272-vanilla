@@ -22,6 +22,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
 import org.springframework.security.web.firewall.HttpFirewall;
@@ -30,6 +31,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CsrfToken;
 
+import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -114,6 +116,19 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
      * The web.ignoring().antMatchers(...) part of the code tells Spring Security to ignore the specified patterns and
      * not apply security to requests matching those. This is useful for static resources like CSS files, JavaScript
      * files, and images, which don't need to be secured.
+     *
+     * URL Security: It allows you to restrict URL patterns. This is useful when you want to apply security at a more
+     * granular level rather than just at the application level.
+     *
+     * Ignoring Resources: You can tell Spring Security to completely ignore certain patterns, which means Spring
+     * Security won't apply any security on those matched paths.
+     *
+     * HTTP Firewall: This helps in guarding the application against various types of attack vectors.
+     * StrictHttpFirewall, as mentioned earlier, is a component that helps tighten the default configuration
+     * to prevent specific web-based attack vectors.
+     *
+     * Custom Filters: It allows the addition of custom filters to the Spring Security filter chain.
+     *
      * @param web
      * @throws Exception
      */
@@ -121,6 +136,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers(
                 "/resources/**", "/static/**", "/css/**", "/js/**", "/images/**");
+
+        // add the Strict Firewall explicit to ensure that the default firewall is not used.
+        web.httpFirewall(httpFirewall());
     }
 
     /**
