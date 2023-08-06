@@ -337,9 +337,11 @@ public final class Utils {
 	 * @param request
 	 * @param _key
 	 * @param _value
+	 * @deprecated Use createSecureCookie(String _key, String _value)
+	 * @see #createSecureCookie(String, String)
 	 * @return
 	 */
-	public static Cookie createCookie(HttpServletRequest request, String _key, String _value) {
+	public static Cookie createSecureCookie(HttpServletRequest request, String _key, String _value) {
 		Cookie c = new Cookie(_key, _value);
 		// c.setDomain(serviceConfig.getServerHost());
 		c.setSecure(true);
@@ -356,9 +358,10 @@ public final class Utils {
 	 * @param _value
 	 * @param _age
 	 * @return
-	 * @deprecated Use createCookie(String _key, String _value)
+	 * @deprecated Use createSecureCookie(String _key, String _value)
+	 *  @see #createSecureCookie(String, String, String, int)
 	 */
-	public static Cookie createCookie(HttpServletRequest request, String _key, String _value, int _age) {
+	public static Cookie createSecureCookie(HttpServletRequest request, String _key, String _value, int _age) {
 		Cookie c = new Cookie(_key, _value);
 		// c.setDomain(serviceConfig.getServerHost());
 		c.setSecure(true);
@@ -370,13 +373,13 @@ public final class Utils {
 
 	/**
 	 * Create Secure Cookie
-	 * 
+	 *
 	 * @param _key
 	 * @param _value
 	 * @return
 	 */
-	public static String createCookie(String _key, String _value) {
-		return createCookie("/", _key, _value, 3600);
+	public static String createSecureCookie(String _key, String _value) {
+		return createSecureCookie("/", _key, _value, 3600);
 	}
 
 	/**
@@ -388,7 +391,7 @@ public final class Utils {
 	 * @param _age
 	 * @return
 	 */
-	public static String createCookie(String _path, String _key, String _value, int _age) {
+	public static String createSecureCookie(String _path, String _key, String _value, int _age) {
 		if(_value == null || _value.isEmpty()) {
 			throw new IllegalArgumentException("Invalid Value for the Cookie: "+_value);
 		}
@@ -404,6 +407,72 @@ public final class Utils {
 				.sameSite("Strict")     // Mitigate CSRF attacks by restricting the sending of the cookie to same-site requests only.
 				.build();
 		return cookie.toString();
+	}
+
+	/**
+	 * Returns HttpHeaders with Secure Cookie
+	 *
+	 * @param _key
+	 * @param _value
+	 * @return
+	 */
+	public static HttpHeaders createSecureCookieHeaders(String _key, String _value) {
+		return createSecureCookieHeaders(null, _key, _value);
+	}
+
+	/**
+	 * Returns HttpHeaders with Secure Cookie
+	 *
+	 * @param _key
+	 * @param _value
+	 * @param _age
+	 * @return
+	 */
+	public static HttpHeaders createSecureCookieHeaders(String _key, String _value, int _age) {
+		return createSecureCookieHeaders(null, _key, _value, _age);
+	}
+
+	/**
+	 * Returns HttpHeaders with Secure Cookie
+	 *
+	 * @param headers
+	 * @param _key
+	 * @param _value
+	 * @return
+	 */
+	public static HttpHeaders createSecureCookieHeaders(HttpHeaders headers, String _key, String _value) {
+		return createSecureCookieHeaders(headers, _key, _value, 3600);
+	}
+
+	/**
+	 * Returns HttpHeaders with Secure Cookie
+	 *
+	 * @param headers
+	 * @param _key
+	 * @param _value
+	 * @param _age
+	 * @return
+	 */
+	public static HttpHeaders createSecureCookieHeaders(HttpHeaders headers, String _key, String _value, int _age) {
+		return createSecureCookieHeaders(headers,"/", _key, _value, _age);
+	}
+
+	/**
+	 * Returns HttpHeaders with Secure Cookie
+	 *
+	 * @param headers
+	 * @param _path
+	 * @param _key
+	 * @param _value
+	 * @param _age
+	 * @return
+	 */
+	public static HttpHeaders createSecureCookieHeaders(HttpHeaders headers, String _path, String _key, String _value, int _age) {
+		if(headers == null) {
+			headers = new HttpHeaders();
+		}
+		headers.add(HttpHeaders.SET_COOKIE, createSecureCookie(_path, _key, _value, _age));
+		return headers;
 	}
 
 	/**

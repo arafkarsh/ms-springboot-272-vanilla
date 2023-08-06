@@ -15,7 +15,6 @@
  */
 package io.fusion.air.microservice.adapters.filters;
 
-import io.fusion.air.microservice.security.JsonWebToken;
 import io.fusion.air.microservice.server.config.ServiceConfiguration;
 import io.fusion.air.microservice.utils.Utils;
 import org.slf4j.Logger;
@@ -24,7 +23,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -55,7 +53,7 @@ public class SecurityFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) _servletRequest;
         HttpServletResponse response = (HttpServletResponse) _servletResponse;
 
-        response.addCookie(Utils.createCookie(request, "JSESSIONID", UUID.randomUUID().toString()));
+        response.addCookie(Utils.createSecureCookie(request, "JSESSIONID", UUID.randomUUID().toString()));
 
         // Return the Headers
         HeaderManager.returnHeaders(request, response);
