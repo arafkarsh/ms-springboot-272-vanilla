@@ -124,11 +124,21 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     /**
-     * Handles Malicious URI Path (handles special characters and other things
-     * Disabled the Bean for Testing SQL Injection and Http Response Splitting Attacks.
+     * Handles Malicious URI Path (handles special characters and other things)
+     *
+     * Blocked HTTP Methods: By default, it allows only GET, POST, HEAD, OPTIONS, and TRACE methods, blocking others
+     * like PUT, DELETE, etc. This is to ensure that only typical browser methods are allowed.
+     * URL Decoding: StrictHttpFirewall prevents multiple URL decoding attempts, which can be an attack vector.
+     * URL ; (semicolon) blocking: By default, it will block URLs that contain a semicolon. This defends against
+     * attacks like request parameter pollution.
+     * URL // (double slash) blocking: Prevents URLs with double slashes.
+     * URL Backslash \ blocking: By default, backslashes are blocked.
+     * URL % (percent) blocking: It can be configured to block URLs with URL-encoded values.
+     *
+     * Disable the Bean for Testing SQL Injection and Http Response Splitting Attacks.
      * @return
      */
-    // @Bean
+    @Bean
     public StrictHttpFirewall httpFirewall() {
         StrictHttpFirewall firewall = new StrictHttpFirewall();
         firewall.setAllowedHttpMethods(Arrays.asList("GET","POST", "PUT", "DELETE"));
@@ -141,7 +151,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
      * Enable the httpFireWall() Bean for Production.
      *
      * @return
-     * @see httpFirewall()
+     * @see #httpFirewall()
      */
     @Bean
     public HttpFirewall defaultHttpFirewall() {
