@@ -17,6 +17,7 @@ package io.fusion.air.microservice.domain.models.order;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 
@@ -27,21 +28,29 @@ import java.math.BigDecimal;
  * @version:
  * @date:
  */
-public class Cart  {
+public class CartWithRestrictions {
 
     @NotBlank(message = "The Customer ID is required.")
+    @Size(min = 3, max = 32, message = "The length of Customer ID must be 3-32 characters.")
+    @Pattern(regexp = "^[a-zA-Z0-9.-]{3,32}$", message = "Must contain only alphanumeric characters, dots, and dashes, between 3 to 32 characters.")
     private String customerId;
 
     @NotBlank(message = "The Product ID is required.")
+    @Size(min = 3, max = 32, message = "The length of Product ID must be 3-32 characters.")
+    @Pattern(regexp = "^[a-zA-Z0-9.-]{3,32}$", message = "Must contain only alphanumeric characters, dots, and dashes, between 3 to 32 characters.")
     private String productId;
 
+    @Size(min = 3, max = 64, message = "The length of Product Name must be 3-32 characters.")
+    @Pattern(regexp = "^[a-zA-Z0-9.-]{3,64}$", message = "Must contain only alphanumeric characters, dots, and dashes, between 3 to 32 characters.")
     private String productName;
 
+    @NotNull(message = "The Price is required.")
     private BigDecimal price;
 
+    @NotNull(message = "The Quantity is required.")
     private BigDecimal quantity;
 
-    public Cart() {}
+    public CartWithRestrictions() {}
 
     /**
      * Get Customer ID
