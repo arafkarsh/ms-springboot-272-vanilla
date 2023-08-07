@@ -10259,6 +10259,293 @@
 					]
 				}
 			]
+		},
+		{
+			"name": "http://localhost:9089/ms-vanilla/api/v1/security/vulnerable/cart/sql/customer/jane.doe%27%20OR%20%271%27%3D%271",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9089/ms-vanilla/api/v1/security/vulnerable/cart/sql/customer/jane.doe%27%20OR%20%271%27%3D%271",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9089",
+					"path": [
+						"ms-vanilla",
+						"api",
+						"v1",
+						"security",
+						"vulnerable",
+						"cart",
+						"sql",
+						"customer",
+						"jane.doe%27%20OR%20%271%27%3D%271"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:9089/ms-vanilla/api/v1/security/fixed/cart/parameter/customer/jane.doe",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJhdWQiOiJnZW5lcmljIiwic3ViIjoiamFuZS5kb2UiLCJ0eXBlIjoiYXV0aCIsImlzcyI6Im9yZ25hbWUiLCJyb2wiOiJVc2VyIiwianRpIjoiMjBkY2M4YWEtYWNlOS00NjY3LTkyMjktNmVjNWU2MDU2NDE4IiwiaWF0IjoxNjkxMTM4NTEzLCJleHAiOjE2OTExMzg4MTN9.z4t5ydx9CGKIEyjnZabNRWp-0jU_n5np3avWquhCuRfYO79aeWTyzeZTpdkIQgu4yol-PiugVp00ucDyo6rhpQ",
+						"type": "text"
+					},
+					{
+						"key": "TX-TOKEN",
+						"value": "Bearer eyJhbGciOiJIUzUxMiJ9.eyJhdWQiOiJ0eC1wdWJzdWIiLCJzdWIiOiJqYW5lLmRvZSIsInR5cGUiOiJ0eC11c2VycyIsImlzcyI6Im9yZ25hbWUiLCJyb2wiOiJVc2VyIiwianRpIjoiMjVmMDkyZTAtOTA0OS00NThiLTllMDAtY2M1OTU5NDEyYjViIiwiaWF0IjoxNjkxMTM3NzY2LCJleHAiOjE2OTExNTU3NjZ9.5ybrdaCriWjDYD8FNsc7XY8AQ1dupI2yRYlwRhMcownVYrwfLWx6aNjM9OZOb-QgqC0WkUTFQLaQ5vZ1c398sg",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:9089/ms-vanilla/api/v1/security/fixed/cart/parameter/customer/jane.doe",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9089",
+					"path": [
+						"ms-vanilla",
+						"api",
+						"v1",
+						"security",
+						"fixed",
+						"cart",
+						"parameter",
+						"customer",
+						"jane.doe"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:9089/ms-vanilla/api/v1/security/fixed/http/split/cart/customer/jane.doe",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9089/ms-vanilla/api/v1/security/fixed/http/split/cart/customer/jane.doe",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9089",
+					"path": [
+						"ms-vanilla",
+						"api",
+						"v1",
+						"security",
+						"fixed",
+						"http",
+						"split",
+						"cart",
+						"customer",
+						"jane.doe"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:9089/ms-vanilla/api/v1/security/fixed/cart/sql/customer/jane.doe%27%20OR%20%271%27%3D%271",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9089/ms-vanilla/api/v1/security/fixed/cart/sql/customer/jane.doe%27%20OR%20%271%27%3D%271",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9089",
+					"path": [
+						"ms-vanilla",
+						"api",
+						"v1",
+						"security",
+						"fixed",
+						"cart",
+						"sql",
+						"customer",
+						"jane.doe%27%20OR%20%271%27%3D%271"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:9089/ms-vanilla/api/v1/security/fixed/cart/sql/customer/jane.doe",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9089/ms-vanilla/api/v1/security/fixed/cart/sql/customer/jane.doe",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9089",
+					"path": [
+						"ms-vanilla",
+						"api",
+						"v1",
+						"security",
+						"fixed",
+						"cart",
+						"sql",
+						"customer",
+						"jane.doe"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:9089/ms-vanilla/api/v1/security/fixed/xml/injection/parseXml",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<person>\n<name>John Doe</name>\n<age>35</age>\n<address>\n<street>329 Cobblestone Ln</street>\n<city>Edison</city>\n<state>NJ</state>\n<zip>08820</zip>\n<country>US</country>\n</address>\n</person>",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9089/ms-vanilla/api/v1/security/fixed/xml/injection/parseXml",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9089",
+					"path": [
+						"ms-vanilla",
+						"api",
+						"v1",
+						"security",
+						"fixed",
+						"xml",
+						"injection",
+						"parseXml"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:9089/ms-vanilla/api/v1/security/fixed/xml/injection/parseXml",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "<?xml version=\"1.0\"?> \n<!DOCTYPE lolz [ \n<!ENTITY lol \"lol\">\n<!ELEMENT lolz (#PCDATA)> \n<!ENTITY lol1 \"&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;\"> \t\n<!ENTITY lol2 \"&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;\"> \n<!ENTITY lol3 \"&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;\"> \n<!ENTITY lol4 \"&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;\"> \n<!ENTITY lol5 \"&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;\"> \n<!ENTITY lol6 \"&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;\"> \n<!ENTITY lol7 \"&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;\"> \n<!ENTITY lol8 \"&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;\"> \n<!ENTITY lol9 \"&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;\"> ]> \n<lolz>&lol9;</lolz>\n",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9089/ms-vanilla/api/v1/security/fixed/xml/injection/parseXml",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9089",
+					"path": [
+						"ms-vanilla",
+						"api",
+						"v1",
+						"security",
+						"fixed",
+						"xml",
+						"injection",
+						"parseXml"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:9089/ms-vanilla/api/v1/security/vulnerable/xml/injection/parseXml",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<person>\n<name>John Doe</name>\n<age>35</age>\n<address>\n<street>329 Cobblestone Ln</street>\n<city>Edison</city>\n<state>NJ</state>\n<zip>08820</zip>\n<country>US</country>\n</address>\n</person>",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9089/ms-vanilla/api/v1/security/vulnerable/xml/injection/parseXml",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9089",
+					"path": [
+						"ms-vanilla",
+						"api",
+						"v1",
+						"security",
+						"vulnerable",
+						"xml",
+						"injection",
+						"parseXml"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:9089/ms-vanilla/api/v1/security/vulnerable/xml/injection/parseXml",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "<?xml version=\"1.0\"?> \n<!DOCTYPE lolz [ \n<!ENTITY lol \"lol\">\n<!ELEMENT lolz (#PCDATA)> \n<!ENTITY lol1 \"&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;&lol;\"> \t\n<!ENTITY lol2 \"&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;&lol1;\"> \n<!ENTITY lol3 \"&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;&lol2;\"> \n<!ENTITY lol4 \"&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;&lol3;\"> \n<!ENTITY lol5 \"&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;\"> \n<!ENTITY lol6 \"&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;\"> \n<!ENTITY lol7 \"&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;\"> \n<!ENTITY lol8 \"&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;\"> \n<!ENTITY lol9 \"&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;\"> ]> \n<lolz>&lol9;</lolz>\n",
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9089/ms-vanilla/api/v1/security/vulnerable/xml/injection/parseXml",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9089",
+					"path": [
+						"ms-vanilla",
+						"api",
+						"v1",
+						"security",
+						"vulnerable",
+						"xml",
+						"injection",
+						"parseXml"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"variable": [
