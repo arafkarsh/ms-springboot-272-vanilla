@@ -70,10 +70,11 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .exceptionHandling().accessDeniedPage("/403");
 
         // Enable CSRF Protection
-        // This line configures the Cross-Site Request Forgery (CSRF) protection, using a Cookie-based CSRF token
-        // repository. This means that CSRF tokens will be stored in cookies. The withHttpOnlyFalse() method makes
-        // these cookies accessible to client-side scripting, which is typically necessary for applications that use
-        // a JavaScript-based frontend.
+        // This line configures the Cross-Site Request Forgery (CSRF) protection, using a header-based CSRF token
+        // repository. This is the recommended approach for CSRF protection. It will cause the server to generate a
+        // CSRF token and set it as a header named X-CSRF-TOKEN. The client must then read the token from the header
+        // and send it as a request header named X-CSRF-TOKEN with each request. The server will then validate the
+        // token to ensure the request is not a CSRF attack.
         // Disabled for Local Testing
         // http.csrf().disable();
         http.csrf()
