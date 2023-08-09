@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * Auto Generates Csrf Token and Saves it in the Header
- * 
+ *
  * @author: Araf Karsh Hamid
  * @version:
  * @date:
