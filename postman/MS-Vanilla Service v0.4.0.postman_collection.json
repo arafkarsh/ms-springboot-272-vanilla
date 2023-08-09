@@ -10546,6 +10546,93 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "http://localhost:9089/ms-vanilla/api/v1/security/vulnerable/csrf/token/customer/1234",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9089/ms-vanilla/api/v1/security/vulnerable/csrf/token/customer/1234",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9089",
+					"path": [
+						"ms-vanilla",
+						"api",
+						"v1",
+						"security",
+						"vulnerable",
+						"csrf",
+						"token",
+						"customer",
+						"1234"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:9089/ms-vanilla/api/v1/security/vulnerable/csrf/validate/customer/1234",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9089/ms-vanilla/api/v1/security/vulnerable/csrf/validate/customer/1234",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9089",
+					"path": [
+						"ms-vanilla",
+						"api",
+						"v1",
+						"security",
+						"vulnerable",
+						"csrf",
+						"validate",
+						"customer",
+						"1234"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:9089/ms-vanilla/api/v1/security/fixed/csrf/validate/customer/1234",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-csrf-token",
+						"value": "5a6dd68e-5ac0-4640-a3d7-337f80f603ed",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:9089/ms-vanilla/api/v1/security/fixed/csrf/validate/customer/1234",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9089",
+					"path": [
+						"ms-vanilla",
+						"api",
+						"v1",
+						"security",
+						"fixed",
+						"csrf",
+						"validate",
+						"customer",
+						"1234"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"variable": [
