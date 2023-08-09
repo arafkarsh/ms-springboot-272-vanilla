@@ -24,6 +24,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
 import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.firewall.StrictHttpFirewall;
@@ -63,21 +64,25 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 // This configures exception handling, specifically specifying that when a user tries to access a page
                 // they're not authorized to view, they're redirected to "/403" (typically an "Access Denied" page).
                 .exceptionHandling().accessDeniedPage("/403");
+
         // Enable CSRF Protection
         // This line configures the Cross-Site Request Forgery (CSRF) protection, using a Cookie-based CSRF token
         // repository. This means that CSRF tokens will be stored in cookies. The withHttpOnlyFalse() method makes
         // these cookies accessible to client-side scripting, which is typically necessary for applications that use
         // a JavaScript-based frontend.
-       /**
-        http
-                .csrf()
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                // Add the above Only for testing in Swagger
-                .and()
-                .addFilterAfter(new CsrfTokenResponseHeaderBindingFilter(), CsrfFilter.class);
-        */
         // Disabled for Local Testing
-        http.csrf().disable();
+        // http.csrf().disable();
+        http.csrf()
+                .csrfTokenRepository(csrfTokenRepository());
+
+        /**
+         http.csrf()
+            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+            // Add the above Only for testing in Swagger
+            .and()
+            .addFilterAfter(new CsrfTokenResponseHeaderBindingFilter(), CsrfFilter.class);
+         */
+
         // X-Frame-Options is a security header that is intended to protect your website against "clickjacking" attacks.
         // Clickjacking is a malicious technique of tricking web users into revealing confidential information or taking
         // control of their interaction with the website, by loading your website in an iframe of another website and
@@ -174,6 +179,15 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Bean
     public HttpFirewall defaultHttpFirewall() {
         return new DefaultHttpFirewall();
+    }
+
+    /**
+     * CSRF Token Implementation
+     * @return
+     */
+    @Bean
+    public CsrfTokenRepository csrfTokenRepository() {
+        return new HeaderCSRFTokenRepository();
     }
 
     /**

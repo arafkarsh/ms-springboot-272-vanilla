@@ -1,20 +1,20 @@
 cloc src
-     100 files     200 files     202 text files.
-classified 180 filesDuplicate file check 180 files (166 known unique)Unique:      100 files                                               172 unique files.                              
-Counting:  100      38 files ignored.
+     100 files     200 files     228 text files.
+classified 182 filesDuplicate file check 182 files (168 known unique)Unique:      100 files                                               174 unique files.                              
+Counting:  100      62 files ignored.
 
-github.com/AlDanial/cloc v 1.94  T=0.19 s (922.6 files/s, 110122.5 lines/s)
+github.com/AlDanial/cloc v 1.94  T=0.16 s (1060.6 files/s, 133153.7 lines/s)
 --------------------------------------------------------------------------------
 Language                      files          blank        comment           code
 --------------------------------------------------------------------------------
-Java                            150           2327           8318           9296
+Java                            151           2381           8943           9912
 Bourne Again Shell               10              0             56            123
-Properties                        3              4             86            115
-XML                               2              8              9             81
+Properties                        3              4             89            115
+XML                               3              8              9             96
 HTML                              4              0              0             48
 Dockerfile                        1             10             25             14
 SQL                               1              0              0              6
 NAnt script                       1              0              0              5
 --------------------------------------------------------------------------------
-SUM:                            172           2349           8494           9688
+SUM:                            174           2403           9122          10319
 --------------------------------------------------------------------------------
