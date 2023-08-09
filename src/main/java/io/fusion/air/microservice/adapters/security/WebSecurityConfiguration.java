@@ -121,7 +121,9 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                         "default-src 'self'; "
                         +"script-src 'self' *."+hostName+"; "
                         +"object-src 'self' *."+hostName+"; "
-                        +"img-src 'self'; media-src 'self'; frame-src 'self'; font-src 'self'; connect-src 'self'");
+                        +"img-src 'self'; media-src 'self'; "
+                        +"frame-src 'self'; font-src 'self'; "
+                        +"connect-src 'self'");
     }
 
     /**
