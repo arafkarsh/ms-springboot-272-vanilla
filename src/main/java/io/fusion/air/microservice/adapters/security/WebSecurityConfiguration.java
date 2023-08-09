@@ -88,8 +88,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             .addFilterAfter(new CsrfTokenResponseHeaderBindingFilter(), CsrfFilter.class);
          */
 
-        // X-Frame-Options is a security header that is intended to protect your website against "clickjacking" attacks.
-        // Clickjacking is a malicious technique of tricking web users into revealing confidential information or taking
+        // X-Frame-Options is a security header that is intended to protect your website against "click-jacking" attacks.
+        // Click-jacking is a malicious technique of tricking web users into revealing confidential information or taking
         // control of their interaction with the website, by loading your website in an iframe of another website and
         // then overlaying it with additional content.
         http.headers().frameOptions().deny();
