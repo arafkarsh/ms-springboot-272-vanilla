@@ -208,14 +208,12 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     public class CustomCsrfMatcher implements RequestMatcher {
         private final Pattern allowedMethods = Pattern.compile("^(GET|POST|PUT|DELETE|HEAD|TRACE|OPTIONS)$");
         private final List<AntPathRequestMatcher> protectedGetMatchers;
-        private final String pathV = "/ms-vanilla/api/v1/security/vulnerable";
         private final String pathF = "/ms-vanilla/api/v1/security/fixed";
-        private final String pathM1 = "/csrf/token/customer";
         private final String pathM2 = "/csrf/validate/customer/**";
 
         public CustomCsrfMatcher() {
             this.protectedGetMatchers = Arrays.asList(
-                    // new AntPathRequestMatcher(pathV + pathM2, "GET"),
+                    // new AntPathRequestMatcher(pathV + pathM1, "GET"),
                     new AntPathRequestMatcher(pathF + pathM2, "GET")
                     // ... add more paths as needed
             );
@@ -223,13 +221,11 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         @Override
         public boolean matches(HttpServletRequest request) {
             // If the request match one url the CSRF protection will be enabled
-            for (AntPathRequestMatcher matcher : protectedGetMatchers) {
-                if (matcher.matches(request)) {
-                    return true;
-                }
-            }
+            boolean isMatched = protectedGetMatchers.stream()
+                    .anyMatch(matcher -> matcher.matches(request));
+
             // Otherwise, use the default behavior for CSRF protection
-            return !allowedMethods.matcher(request.getMethod()).matches();
+            return isMatched || !allowedMethods.matcher(request.getMethod()).matches();
         }
     };
 
