@@ -227,7 +227,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
             // Otherwise, use the default behavior for CSRF protection
             return isMatched || !allowedMethods.matcher(request.getMethod()).matches();
         }
-    };
+    }
 
     /**
      * ONLY For Local Testing with Custom CSRF Headers in Swagger APi Docs
