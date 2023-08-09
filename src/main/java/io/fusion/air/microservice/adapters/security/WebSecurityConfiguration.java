@@ -213,8 +213,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
         public CustomCsrfMatcher() {
             this.protectedGetMatchers = Arrays.asList(
-                    // new AntPathRequestMatcher(pathV + pathM1, "GET"),
-                    new AntPathRequestMatcher(pathF + pathM2, "GET")
+                    // new AntPathRequestMatcher(pathV + "path"", "GET"),
+                    new AntPathRequestMatcher(pathF + "/csrf/validate/customer/**", "GET")
                     // ... add more paths as needed
             );
         }
