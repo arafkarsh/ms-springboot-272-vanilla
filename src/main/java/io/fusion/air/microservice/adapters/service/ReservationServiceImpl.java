@@ -60,8 +60,6 @@ public class ReservationServiceImpl implements ReservationService {
     @Autowired
     private ReservationRepository reservationRepository;
 
-    @Autowired
-    private ReservationStateMachineService reservationStateMachineService;
 
     /**
      * ONLY FOR TESTING PURPOSE

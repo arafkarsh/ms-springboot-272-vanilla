@@ -60,8 +60,8 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private OrderRepository orderRepository;
 
-    @Autowired
-    private OrderStateMachineService orderStateMachineService;
+    // @Autowired
+    // private OrderStateMachineService orderStateMachineService;
 
     /**
      * ONLY FOR TESTING PURPOSE
@@ -165,7 +165,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderEntity processCreditApproval(String customerId, String orderId) {
         Optional<OrderEntity> orderOpt = findById( customerId,  orderId);
         log.info("[1] Process Order ID = "+orderId);
-        orderStateMachineService.creditCheckRequest(orderOpt.get());
+        // orderStateMachineService.creditCheckRequest(orderOpt.get());
         return orderOpt.get();
     }
 
@@ -203,83 +203,6 @@ public class OrderServiceImpl implements OrderService {
         System.out.println("--------------------------------------------------------------------------------------------------");
 
         OrderEntity order = orderOpt.get();
-        switch(orderEvent) {
-            case CREDIT_CHECKING_EVENT:
-                orderStateMachineService.creditCheckRequest(order);
-                break;
-
-            case CREDIT_APPROVED_EVENT:
-                orderStateMachineService.creditApproved(order);
-                break;
-
-            case CREDIT_DECLINED_EVENT:
-                orderStateMachineService.creditDeclined(order);
-                break;
-
-            case PAYMENT_INIT_EVENT:
-                orderStateMachineService.paymentInit(order);
-                break;
-
-            case PAYMENT_APPROVED_EVENT:
-                orderStateMachineService.paymentApproved(order);
-                break;
-
-            case PAYMENT_DECLINED_EVENT:
-                orderStateMachineService.paymentDeclined(order);
-                break;
-
-            case PACKAGE_FORK_EVENT:
-                ArrayList<OrderEvent> events = new ArrayList<OrderEvent>();
-                events.add(OrderEvent.PACKAGE_FORK_EVENT);
-                events.add(OrderEvent.PACKAGE_EVENT);
-                events.add(OrderEvent.ORDER_SEND_BILL_EVENT);
-                events.add(OrderEvent.ORDER_READY_TO_SHIP_EVENT);
-                // events.add(OrderEvent.ORDER_SHIPPED_EVENT);
-                orderStateMachineService.multipleEvents(order, events);
-                /**
-                    orderStateMachineService.packageFork(order);
-                    // break;
-                 */
-            case PACKAGE_EVENT:
-                orderStateMachineService.orderPackage(order);
-                break;
-
-            case ORDER_SEND_BILL_EVENT:
-                orderStateMachineService.sendBill(order);
-                break;
-
-            case ORDER_READY_TO_SHIP_EVENT:
-                orderStateMachineService.readyToShip(order);
-                break;
-
-            case ORDER_SHIPPED_EVENT:
-                orderStateMachineService.shipTheProduct(order);
-                break;
-
-            case ORDER_IN_TRANSIT_EVENT:
-                orderStateMachineService.orderInTransit(order);
-                break;
-
-            case SEND_FOR_DELIVERY_EVENT:
-                orderStateMachineService.sendForDelivery(order);
-                break;
-
-            case ORDER_CANCELLED_EVENT:
-                orderStateMachineService.orderCancelled(order);
-                break;
-
-            case ORDER_DELIVERED_EVENT:
-                orderStateMachineService.orderDelivered(order);
-                break;
-
-            case ORDER_RETURNED_EVENT:
-                orderStateMachineService.orderReturned(order);
-                break;
-
-            default:
-                System.out.println("INVALID EVENT ..... ");
-                break;
-        }
         return order;
     }
 
@@ -292,7 +215,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderEntity processPaymentRequest(String customerId, String orderId) {
         Optional<OrderEntity> orderOpt = findById( customerId,  orderId);
         log.info("Process Order ID = "+orderId);
-        orderStateMachineService.paymentInit(orderOpt.get());
+        // orderStateMachineService.paymentInit(orderOpt.get());
         return orderOpt.get();
     }
 }

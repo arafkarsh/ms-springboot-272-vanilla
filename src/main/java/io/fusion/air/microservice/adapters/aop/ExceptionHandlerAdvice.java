@@ -156,11 +156,16 @@ public class ExceptionHandlerAdvice extends ResponseEntityExceptionHandler {
             ase.setErrorCode(errorCode);
         }
         logException(errorCode,  _exception);
-        StandardResponse stdResponse = Utils.createErrorResponse(null, errorPrefix, _errorCode, _httpStatus,  _message);
-        if(_headers != null) {
-            return new ResponseEntity<>(stdResponse, _headers, _httpStatus);
+        if(_headers == null) {
+            _headers = new HttpHeaders();
         }
-        return new ResponseEntity<>(stdResponse, _httpStatus);
+        _headers.addIfAbsent("Content-Type", "application/json");
+        _headers.addIfAbsent("Accept", "application/json");
+        StandardResponse stdResponse = Utils.createErrorResponse(null, errorPrefix, _errorCode, _httpStatus,  _message);
+       //  if(_headers != null) {
+        //    return new ResponseEntity<>(stdResponse, _headers, _httpStatus);
+        //}
+        return new ResponseEntity<>(stdResponse, _headers, _httpStatus);
     }
 
     /**

@@ -71,7 +71,7 @@ public class TimeTrackerAspect {
      * @return
      * @throws Throwable
      */
-    @Around(value = "execution(* io.fusion.air.microservice.adapters.controllers.*.*(..))")
+    @Around(value = "execution(* io.fusion.air.microservice.adapters.controllers..*.*(..))")
     public Object timeTrackerRest(ProceedingJoinPoint joinPoint) throws Throwable {
         return trackTime("WS", joinPoint);
     }
@@ -84,7 +84,7 @@ public class TimeTrackerAspect {
      */
     @Around(value = "execution(* io.fusion.air.microservice.adapters.controllers.exploits.*.*(..))")
     public Object timeTrackerRestFixed(ProceedingJoinPoint joinPoint) throws Throwable {
-        return trackTime("WS", joinPoint);
+        return trackTime("WS1", joinPoint);
     }
 
     /**
@@ -95,7 +95,7 @@ public class TimeTrackerAspect {
      */
     @Around(value = "execution(* io.fusion.air.microservice.adapters.controllers.open.*.*(..))")
     public Object timeTrackerRestOpen(ProceedingJoinPoint joinPoint) throws Throwable {
-        return trackTime("WS", joinPoint);
+        return trackTime("WS2", joinPoint);
     }
 
     /**
@@ -106,7 +106,7 @@ public class TimeTrackerAspect {
      */
     @Around(value = "execution(* io.fusion.air.microservice.adapters.controllers.secured.*.*(..))")
     public Object timeTrackerRestSecured(ProceedingJoinPoint joinPoint) throws Throwable {
-        return trackTime("WS", joinPoint);
+        return trackTime("WS3", joinPoint);
     }
 
     /**

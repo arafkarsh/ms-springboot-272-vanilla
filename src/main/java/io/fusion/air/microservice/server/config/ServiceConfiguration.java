@@ -177,6 +177,10 @@ public class ServiceConfiguration implements Serializable {
 
 	@Value("${server.port:9080}")
 	private int serverPort;
+
+	// server.vulnerability.demos.allowed=false
+	@Value("${server.vulnerability.demos.allowed:false}")
+	private boolean vulnerabilityDemoAllowed;
 	
 	@Value("${payment.gateway.host:localhost}")
 	private String paymentGWHost;
@@ -317,6 +321,14 @@ public class ServiceConfiguration implements Serializable {
 	 */
 	public String apiURL() {
 		return "http://localhost:"+serverPort+""+ apiDocPath;
+	}
+
+	/**
+	 * By Default Returns False
+	 * @return
+	 */
+	public boolean isVulnerabilityDemoAllowed() {
+		return vulnerabilityDemoAllowed;
 	}
 
 	/**
