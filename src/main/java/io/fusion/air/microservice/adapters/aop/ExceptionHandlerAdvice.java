@@ -78,6 +78,36 @@ public class ExceptionHandlerAdvice extends ResponseEntityExceptionHandler {
     }
 
     /**
+     * Build Standard Error Response
+     * @param _exception
+     * @param _message
+     * @param _errorCode
+     * @param _headers
+     * @param _httpStatus
+     * @param _request
+     * @return
+     */
+    private ResponseEntity<Object> createErrorResponse(Throwable _exception, String _message, String _errorCode,
+                                                       HttpHeaders _headers, HttpStatus _httpStatus, WebRequest _request) {
+
+        String errorPrefix = (serviceConfig != null) ? serviceConfig.getServiceAPIErrorPrefix() : "AK";
+        String errorCode = errorPrefix+_errorCode;
+        if(_exception instanceof AbstractServiceException) {
+            AbstractServiceException ase = (AbstractServiceException)_exception;
+            ase.setErrorCode(errorCode);
+        }
+        logException(errorCode,  _exception);
+        if(_headers == null) {
+            _headers = new HttpHeaders();
+        }
+        String remoteUser = _request.getRemoteUser();
+        _headers.addIfAbsent("Content-Type", "application/json");
+        _headers.addIfAbsent("Accept", "application/json");
+        StandardResponse stdResponse = Utils.createErrorResponse(null, errorPrefix, _errorCode, _httpStatus,  _message);
+        return new ResponseEntity<>(stdResponse, _headers, _httpStatus);
+    }
+
+    /**
      * Build Error Response Entity
      * @param _ex
      * @param _status
@@ -134,38 +164,6 @@ public class ExceptionHandlerAdvice extends ResponseEntityExceptionHandler {
     private ResponseEntity<Object> createErrorResponse(PersistenceException _pEx, String _message,
                                                       String _errorCode, WebRequest _request) {
         return createErrorResponse(_pEx, _message, _errorCode, null, HttpStatus.BAD_REQUEST, _request);
-    }
-
-    /**
-     * Build Standard Error Response
-     * @param _exception
-     * @param _message
-     * @param _errorCode
-     * @param _headers
-     * @param _httpStatus
-     * @param _request
-     * @return
-     */
-    private ResponseEntity<Object> createErrorResponse(Throwable _exception, String _message, String _errorCode,
-                                                       HttpHeaders _headers, HttpStatus _httpStatus, WebRequest _request) {
-
-        String errorPrefix = (serviceConfig != null) ? serviceConfig.getServiceAPIErrorPrefix() : "AK";
-        String errorCode = errorPrefix+_errorCode;
-        if(_exception instanceof AbstractServiceException) {
-            AbstractServiceException ase = (AbstractServiceException)_exception;
-            ase.setErrorCode(errorCode);
-        }
-        logException(errorCode,  _exception);
-        if(_headers == null) {
-            _headers = new HttpHeaders();
-        }
-        _headers.addIfAbsent("Content-Type", "application/json");
-        _headers.addIfAbsent("Accept", "application/json");
-        StandardResponse stdResponse = Utils.createErrorResponse(null, errorPrefix, _errorCode, _httpStatus,  _message);
-       //  if(_headers != null) {
-        //    return new ResponseEntity<>(stdResponse, _headers, _httpStatus);
-        //}
-        return new ResponseEntity<>(stdResponse, _headers, _httpStatus);
     }
 
     /**
@@ -512,6 +510,17 @@ public class ExceptionHandlerAdvice extends ResponseEntityExceptionHandler {
     }
 
     /**
+     * Invalid Input Exception
+     * @param _idEx
+     * @param _request
+     * @return
+     */
+    @ExceptionHandler(value = InvalidInputException.class)
+    public ResponseEntity<Object> handleInvalidInputException(InvalidInputException _idEx,  WebRequest _request) {
+        return createErrorResponse(_idEx, "462", _request);
+    }
+
+    /**
      * Mandatory Data Required Exception
      * @param _mdrEx
      * @param _request
@@ -541,7 +550,7 @@ public class ExceptionHandlerAdvice extends ResponseEntityExceptionHandler {
     private void logException(String _status, Throwable e) {
         log.info("2|EH|TIME=00|STACK TRACE: "+e.getMessage());
         log.info(getStackTraceAsString(e));
-        log.info("2|EH|TIME=00|STATUS=Error: {}|CLASS={}|",_status, e.toString());
+        log.info("2|EH|TIME=00|STATUS=ERROR: {}|CLASS={}|",_status, e.getMessage());
     }
 
     /**
