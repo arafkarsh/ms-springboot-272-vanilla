@@ -40,6 +40,7 @@ import org.springframework.web.context.annotation.RequestScope;
 import org.slf4j.Logger;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static java.lang.invoke.MethodHandles.lookup;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -303,6 +304,35 @@ public class FileControllerImpl extends AbstractController {
 			ArrayList<String> files = fileNIOExample.showFilesInDirectory();
 			StandardResponse stdResponse = createSuccessResponse("File NIO List Directories!");
 			stdResponse.setPayload(files);
+			return ResponseEntity.ok(stdResponse);
+		} catch (Exception e) {
+			log.error("|"+name()+"|File NIO Error Occurred: "+e.getMessage());
+			throw new DataNotFoundException("FILE NIO Error: "+e.getMessage());
+		}
+	}
+
+	/**
+	 * NIO File Handling
+	 * @return
+	 * @throws Exception
+	 */
+	@Operation(summary = "File Processing Java NIO File Handling", description = "File Processing Java NIO")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					description = "Data Found!",
+					content = {@Content(mediaType = "application/json")}),
+			@ApiResponse(responseCode = "400",
+					description = "Unable to Find Data",
+					content = @Content)
+	})
+	@GetMapping("/nio/file/handling")
+	public ResponseEntity<StandardResponse> fileHandling() throws Exception {
+		// Read the File from the Resource Folder
+		log.debug("|"+name()+"|Security IO: Request to List Directories");
+		try {
+			HashMap<String, String> data = fileNIOExample.fileHandlingNIO();
+			StandardResponse stdResponse = createSuccessResponse("File NIO File Handling!");
+			stdResponse.setPayload(data);
 			return ResponseEntity.ok(stdResponse);
 		} catch (Exception e) {
 			log.error("|"+name()+"|File NIO Error Occurred: "+e.getMessage());

@@ -28,7 +28,9 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 // SLF4J
 import org.slf4j.Logger;
@@ -269,6 +271,51 @@ public class FileNIOExample  extends AbstractFileProcessing {
             e.printStackTrace();
         }
         return files;
+    }
+
+    /**
+     * Read / Write / Delete File
+     * @return
+     */
+    public HashMap<String, String>  fileHandlingNIO() {
+        // Creating a Path using Paths.get() method
+        HashMap<String, String> map = new HashMap<>();
+        Path path = Paths.get("example.txt");
+        String data = "ERROR in FILE NIO HANDLING";
+        // Writing to a file using Files.write() method
+        try {
+            data =  LocalDate.now().toString()+" Hello, NIO2!";
+            Files.write(path,data.getBytes());
+            map.put("Write", "File written successfully!");
+            log.info("File written successfully!");
+        } catch (IOException e) {
+            e.printStackTrace();
+            map.put("Write Error", e.getMessage());
+        }
+
+        // Reading from a file using Files.readAllBytes() method
+        try {
+            byte[] bytes = Files.readAllBytes(path);
+            data = new String(bytes);
+            map.put("Read", "File read successfully!");
+            log.info("Content of the file: " +data);
+        } catch (IOException e) {
+            e.printStackTrace();
+            map.put("Read Error", e.getMessage());
+
+        }
+
+        // Deleting a file using Files.delete() method
+        try {
+            Files.delete(path);
+            map.put("Delete", "File deleted successfully!");
+            log.info("File deleted successfully!");
+        } catch (IOException e) {
+            e.printStackTrace();
+            map.put("Delete Error", e.getMessage());
+        }
+        map.put("Data", data);
+        return map;
     }
 
 }
