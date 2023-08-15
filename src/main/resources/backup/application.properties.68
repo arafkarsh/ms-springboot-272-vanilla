@@ -1,3 +1,8 @@
+# =======================================================================
+# MS-Vanilla Service Properties
+# =======================================================================
+build.number=69
+build.date=Tue Aug 15 14:07:06 IST 2023
 # ------------------------------------------------------------------------
 # Spring Profile
 # ------------------------------------------------------------------------
@@ -20,7 +25,7 @@ service.license=Apache 2 License
 # Microservice Server Properties
 # =======================================================================
 server.port=9089
-server.version=0.4.2
+server.version=0.4.1
 server.restart=false
 server.leak.test=3
 server.resources.url=${service.url}${service.api.path}
