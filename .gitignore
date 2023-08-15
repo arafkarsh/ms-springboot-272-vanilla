@@ -8,6 +8,10 @@ src/docker/Dockerfile-r
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+a10.txt
+a100.txt
+### src/main/resources/static/data/a.txt
+
 ### Dont Commit Private Keys
 privateKey.pem
 

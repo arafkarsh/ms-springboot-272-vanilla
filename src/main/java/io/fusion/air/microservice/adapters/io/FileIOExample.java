@@ -93,7 +93,7 @@ public class FileIOExample extends AbstractFileProcessing {
     }
 
     /**
-     * Read File Content
+     * Read File Content using Input Stream
      *
      * @param inputStream
      * @param bufferSize
@@ -108,6 +108,60 @@ public class FileIOExample extends AbstractFileProcessing {
             String line;
             while ((line = br.readLine()) != null) {
                 sb.append(line).append(System.lineSeparator());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            calculateTime(startTime, sb);
+        }
+        return sb;
+    }
+
+    /**
+     * Read File Content
+     * @param fileName
+     * @param bufferSize
+     * @return
+     */
+    public StringBuilder readFileContentBuffer(String fileName, int bufferSize, boolean showFile) {
+        long startTime = System.nanoTime();
+        StringBuilder sb = new StringBuilder();
+        try (FileReader fileReader = new FileReader(fileName);
+             BufferedReader bufferedReader = new BufferedReader(fileReader, bufferSize)) {
+
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                if(showFile) {
+                    sb.append(line).append(System.lineSeparator());
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            calculateTime(startTime, sb);
+        }
+        return sb;
+    }
+
+    /**
+     * Read File Content using Random Access File
+     * @param fileName
+     * @param bufferSize
+     * @param showFile
+     * @return
+     */
+    public StringBuilder readFileContent(String fileName, int bufferSize, boolean showFile) {
+        long startTime = System.nanoTime();
+        StringBuilder sb = new StringBuilder();
+        try (RandomAccessFile raf = new RandomAccessFile(fileName, "r")) {
+            // If you want to seek to the beginning, use:
+            raf.seek(0);
+
+            String line;
+            while ((line = raf.readLine()) != null) {
+                if (showFile) {
+                    sb.append(line).append(System.lineSeparator());
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

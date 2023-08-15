@@ -141,6 +141,40 @@ public class FileControllerImpl extends AbstractController {
 	}
 
 	/**
+	 * File IO Read Local Content
+	 * @param fileName
+	 * @param buffer
+	 * @return
+	 * @throws Exception
+	 */
+	@Operation(summary = "File Processing Java IO Read Local Content", description = "File Processing Java IO")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					description = "Data Found!",
+					content = {@Content(mediaType = "application/json")}),
+			@ApiResponse(responseCode = "400",
+					description = "Unable to Find Data",
+					content = @Content)
+	})
+	@GetMapping("/io/file/read/content/file/{fileName}/buffer/{buffer}/show/{showFile}")
+	public ResponseEntity<StandardResponse> fileIOLocalContent(
+					@PathVariable("fileName")String fileName,
+					@PathVariable("buffer")int buffer,
+					@PathVariable("showFile")boolean showFile) throws Exception {
+		// Read the File from the Resource Folder
+		log.debug("|"+name()+"|Security IO: Request to Read Local File ("+fileName+") Buffer="+buffer);
+		try {
+			StringBuilder sb = fileIOExample.readFileContent(fileName,buffer, showFile);
+			StandardResponse stdResponse = createSuccessResponse("File IO Read Local Content!");
+			stdResponse.setPayload(getContent(sb));
+			return ResponseEntity.ok(stdResponse);
+		} catch (Exception e) {
+			log.error("|"+name()+"|File IO Error Occurred: "+e.getMessage());
+			throw new DataNotFoundException("FILE IO Error: "+e.getMessage());
+		}
+	}
+
+	/**
 	 * File NIO
 	 * @param counter
 	 * @param buffer
@@ -204,6 +238,40 @@ public class FileControllerImpl extends AbstractController {
 		}
 	}
 
+	/**
+	 * File NIO Read Local Content
+	 * @param fileName
+	 * @param buffer
+	 * @return
+	 * @throws Exception
+	 */
+	@Operation(summary = "File Processing Java NIO Read Local Content", description = "File Processing Java NIO")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					description = "Data Found!",
+					content = {@Content(mediaType = "application/json")}),
+			@ApiResponse(responseCode = "400",
+					description = "Unable to Find Data",
+					content = @Content)
+	})
+	@GetMapping("/nio/file/read/content/file/{fileName}/buffer/{buffer}/show/{showFile}")
+	public ResponseEntity<StandardResponse> fileNIOLocalContent(
+									@PathVariable("fileName")String fileName,
+									@PathVariable("buffer")int buffer,
+									@PathVariable("showFile")boolean showFile) throws Exception {
+		// Read the File from the Resource Folder
+		log.debug("|"+name()+"|Security IO: Request to Read Local File ("+fileName+") Buffer="+buffer);
+		try {
+			StringBuilder sb = fileNIOExample.readFileContent(fileName,buffer, showFile);
+			StandardResponse stdResponse = createSuccessResponse("File NIO Read Local Content!");
+			stdResponse.setPayload(getContent(sb));
+			return ResponseEntity.ok(stdResponse);
+		} catch (Exception e) {
+			log.error("|"+name()+"|File NIO Error Occurred: "+e.getMessage());
+			throw new DataNotFoundException("FILE NIO Error: "+e.getMessage());
+		}
+	}
+
 	private ArrayList<String> getContent(StringBuilder sb) {
 		ArrayList<String> content = new ArrayList<>();
 		String[] lines = sb.toString().split("\n");
@@ -211,5 +279,34 @@ public class FileControllerImpl extends AbstractController {
 			content.add(line);
 		}
 		return content;
+	}
+
+	/**
+	 * File NIO List Directories
+	 * @return
+	 * @throws Exception
+	 */
+	@Operation(summary = "File Processing Java NIO List Directories", description = "File Processing Java NIO")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					description = "Data Found!",
+					content = {@Content(mediaType = "application/json")}),
+			@ApiResponse(responseCode = "400",
+					description = "Unable to Find Data",
+					content = @Content)
+	})
+	@GetMapping("/nio/directories/list/all")
+	public ResponseEntity<StandardResponse> listDirectories() throws Exception {
+		// Read the File from the Resource Folder
+		log.debug("|"+name()+"|Security IO: Request to List Directories");
+		try {
+			ArrayList<String> files = fileNIOExample.showFilesInDirectory();
+			StandardResponse stdResponse = createSuccessResponse("File NIO List Directories!");
+			stdResponse.setPayload(files);
+			return ResponseEntity.ok(stdResponse);
+		} catch (Exception e) {
+			log.error("|"+name()+"|File NIO Error Occurred: "+e.getMessage());
+			throw new DataNotFoundException("FILE NIO Error: "+e.getMessage());
+		}
 	}
  }

@@ -58,12 +58,20 @@ public abstract class AbstractFileProcessing {
     public abstract long readFile(InputStream inputStream, int bufferSize );
 
     /**
-     * Read File Content
+     * Read File Content from Input Stream
      * @param inputStream
      * @param bufferSize
      * @return
      */
     public abstract StringBuilder readFileContent(InputStream inputStream, int bufferSize );
+
+    /**
+     * Read File Content from File
+     * @param fileName
+     * @param bufferSize
+     * @return
+     */
+    public abstract StringBuilder readFileContent(String fileName, int bufferSize, boolean showFile);
 
     /**
      * Log the Processing Time

@@ -20,12 +20,16 @@ import org.springframework.stereotype.Service;
 // Java IO
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.MappedByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Scanner;
 // SLF4J
 import org.slf4j.Logger;
 import static java.lang.invoke.MethodHandles.lookup;
@@ -117,7 +121,8 @@ public class FileNIOExample  extends AbstractFileProcessing {
      * to read data from the input stream more effectively. It creates a bridge between old I/O and NIO, letting
      * you use the more advanced features of NIO without changing the original source of data.
      *
-     * ByteBuffer.allocate():
+     * ByteBuffer.allocate(): Allocates into JVM Heap
+     * ByteBuffer.allocateDirect(): Directly into OS Virtual Memory
      * What It Does: Allocates a new byte buffer with the given capacity.
      * Why It's Critical: By allocating a buffer of a specific size, you can control how much data is read from the
      * file at once. It helps in optimizing memory usage and read efficiency, especially with large files. The buffer
@@ -162,7 +167,7 @@ public class FileNIOExample  extends AbstractFileProcessing {
 
 
     /**
-     * Read File Content
+     * Read File Content from Input Stream
      * @param inputStream
      * @param bufferSize
      * @return
@@ -183,6 +188,87 @@ public class FileNIOExample  extends AbstractFileProcessing {
             calculateTime(startTime, sb);
         }
         return sb;
+    }
+
+
+    /**
+     * Read File Content from File
+     * @param fileName
+     * @param bufferSize
+     * @return
+     */
+    public StringBuilder readFileContent(String fileName, int bufferSize, boolean showFile) {
+        long startTime = System.nanoTime();
+        StringBuilder sb = new StringBuilder();
+        try (FileChannel fileChannel = FileChannel.open(Paths.get(fileName), StandardOpenOption.READ)) {
+            MappedByteBuffer buffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, fileChannel.size());
+            CharBuffer charBuffer = StandardCharsets.UTF_8.decode(buffer);
+
+            // Disable File Showing for large files
+            if(fileChannel.size() > 1024000) {
+                showFile = false;
+            }
+
+            /**
+            try (Scanner scanner = new Scanner(charBuffer)) {
+                while (scanner.hasNextLine()) {
+                    String line = scanner.nextLine();
+                    if(showFile) {
+                        sb.append(line).append(System.lineSeparator());
+                    }
+                }
+            }
+             */
+            int start = 0;
+            for (int end = 0; end < charBuffer.length(); end++) {
+                if (charBuffer.charAt(end) == '\n') {
+                    CharSequence line = charBuffer.subSequence(start, end);
+                    start = end + 1;
+                    if (showFile) {
+                        sb.append(line).append(System.lineSeparator());
+                    }
+                }
+            }
+            if (showFile) {
+                // Append remaining characters if any
+                if (start < charBuffer.length()) {
+                    sb.append(charBuffer.subSequence(start, charBuffer.length()));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            calculateTime(startTime, sb);
+        }
+        return sb;
+    }
+
+    /**
+     * Read File Content from File
+     *
+     * @return
+     */
+    public  ArrayList<String> showFilesInDirectory() {
+        ArrayList<String> files = new ArrayList<String>();
+        Path startPath = Paths.get("src/main/java");
+        try {
+            Files.walkFileTree(startPath, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                    // System.out.println(file);
+                    files.add(file.toString());
+                    return FileVisitResult.CONTINUE;
+                }
+
+                @Override
+                public FileVisitResult visitFileFailed(Path file, IOException exc) {
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return files;
     }
 
 }
