@@ -22,9 +22,7 @@ import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.MappedByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -32,6 +30,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 // SLF4J
 import org.slf4j.Logger;
 import static java.lang.invoke.MethodHandles.lookup;
@@ -316,6 +316,53 @@ public class FileNIOExample  extends AbstractFileProcessing {
         }
         map.put("Data", data);
         return map;
+    }
+
+    /**
+     * Read Data Asynchronously from File
+     *
+     * @param fileName
+     * @param bufferSize
+     * @param showFile
+     * @return
+     */
+    public StringBuilder asyncFileRead(String fileName, int bufferSize, boolean showFile) {
+        long startTime = System.nanoTime();
+        // This Code is NOT required if Reactive Framework is used
+        CompletableFuture<StringBuilder> future = new CompletableFuture<>();
+
+        final StringBuilder sb = new StringBuilder();
+        try (AsynchronousFileChannel fileChannel = AsynchronousFileChannel.open(Paths.get(fileName), StandardOpenOption.READ)) {
+            ByteBuffer buffer = ByteBuffer.allocate(bufferSize);
+            fileChannel.read(buffer, 0, buffer, new CompletionHandler<Integer, ByteBuffer>() {
+                @Override
+                public void completed(Integer result, ByteBuffer byteBuffer) {
+                    System.out.println("Read completed");
+                    byteBuffer.flip();
+                    byte[] data = new byte[byteBuffer.limit()];
+                    byteBuffer.get(data);
+                    // System.out.println(new String(data));
+                    if(showFile) {
+                        sb.append(new String(data));
+                    }
+                    future.complete(sb); // Completing the future with the result
+                }
+
+                @Override
+                public void failed(Throwable exc, ByteBuffer byteBuffer) {
+                    System.err.println("Read failed: " + exc);
+                    future.completeExceptionally(exc); // Completing the future with an exception
+                }
+            });
+            // Waiting for the future to complete
+            future.get();
+        } catch (IOException |  ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } finally {
+            calculateTime(startTime, sb);
+        }
+        return sb;
     }
 
 }
