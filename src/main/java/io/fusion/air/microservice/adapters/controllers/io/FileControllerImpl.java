@@ -307,7 +307,7 @@ public class FileControllerImpl extends AbstractController {
 	 * @return
 	 * @throws Exception
 	 */
-	@Operation(summary = "File Processing Java NIO File Handling", description = "File Processing Java NIO")
+	@Operation(summary = "File Processing Java NIO File Handling - Write / Read / Delete", description = "File Processing Java NIO")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200",
 					description = "Data Found!",
