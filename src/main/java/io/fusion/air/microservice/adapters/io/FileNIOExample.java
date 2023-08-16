@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.*;
+import java.nio.charset.CharsetDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -378,22 +379,24 @@ public class FileNIOExample  extends AbstractFileProcessing {
             ByteBuffer buffer = ByteBuffer.wrap("Creating a Sparse File with Holes!".getBytes());
             fileChannel.write(buffer);                           // Write data starting from the 1 GiB position
 
+            CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder();
             MappedByteBuffer mappedBuffer = null;
             long mapSize = 100L * 1024L * 1024L;                // Size of each mapped portion (100 MB)
             for (long i = 0; i < position; i += mapSize) {
                 long size = Math.min(mapSize, position - i);
                 mappedBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, i, size);
-            }
-            CharBuffer charBuffer = StandardCharsets.UTF_8.decode(mappedBuffer);
-            // Disable File Showing for large files
-            if (fileChannel.size() > 1024000) {
-                showFile = false;
-            }
-            try (Scanner scanner = new Scanner(charBuffer)) {
-                while (scanner.hasNextLine()) {
-                    String line = scanner.nextLine();
-                    if (showFile) {
-                        sb.append(line).append(System.lineSeparator());
+                // Decode the bytes directly in the buffer
+                CharBuffer charBuffer = decoder.decode(mappedBuffer);
+                // Disable File Showing for large files
+                if (fileChannel.size() > 1024000) {
+                    showFile = false;
+                }
+                try (Scanner scanner = new Scanner(charBuffer)) {
+                    while (scanner.hasNextLine()) {
+                        String line = scanner.nextLine();
+                        if (showFile) {
+                            sb.append(line).append(System.lineSeparator());
+                        }
                     }
                 }
             }
