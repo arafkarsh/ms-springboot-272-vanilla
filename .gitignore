@@ -10,6 +10,7 @@ src/docker/Dockerfile-r
 
 a10.txt
 a100.txt
+s1gb.txt
 ### src/main/resources/static/data/a.txt
 
 ### Dont Commit Private Keys

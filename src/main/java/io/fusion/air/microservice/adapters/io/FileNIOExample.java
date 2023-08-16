@@ -360,4 +360,49 @@ public class FileNIOExample  extends AbstractFileProcessing {
         return sb;
     }
 
+    /**
+     * Create a Sparse 1GB File with Holes
+     * @param fileName
+     * @param showFile
+     * @return
+     */
+    public StringBuilder createSparseFile(String fileName, boolean showFile) {
+        long startTime = System.nanoTime();
+        StringBuilder sb = new StringBuilder();
+        try (FileChannel fileChannel = FileChannel.open(Paths.get(fileName), StandardOpenOption.WRITE,
+                                        StandardOpenOption.READ, StandardOpenOption.TRUNCATE_EXISTING,
+                                        StandardOpenOption.CREATE, StandardOpenOption.SPARSE)) {
+            // Create a 1 GB File with Holes
+            long position = 1024L * 1024L * 1024L;              // 1 GiB into the file
+            fileChannel.position(position);                      // Set position 1 GiB into the file
+            ByteBuffer buffer = ByteBuffer.wrap("Creating a Sparse File with Holes!".getBytes());
+            fileChannel.write(buffer);                           // Write data starting from the 1 GiB position
+
+            MappedByteBuffer mappedBuffer = null;
+            long mapSize = 100L * 1024L * 1024L;                // Size of each mapped portion (100 MB)
+            for (long i = 0; i < position; i += mapSize) {
+                long size = Math.min(mapSize, position - i);
+                mappedBuffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, i, size);
+            }
+            CharBuffer charBuffer = StandardCharsets.UTF_8.decode(mappedBuffer);
+            // Disable File Showing for large files
+            if (fileChannel.size() > 1024000) {
+                showFile = false;
+            }
+            try (Scanner scanner = new Scanner(charBuffer)) {
+                while (scanner.hasNextLine()) {
+                    String line = scanner.nextLine();
+                    if (showFile) {
+                        sb.append(line).append(System.lineSeparator());
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            calculateTime(startTime, sb);
+        }
+        return sb;
+    }
+
 }

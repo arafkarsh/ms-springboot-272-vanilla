@@ -331,6 +331,13 @@ public class FileControllerImpl extends AbstractController {
 		}
 	}
 
+	/**
+	 * File NIO Async Read Local Content
+	 * @param fileName
+	 * @param buffer
+	 * @return
+	 * @throws Exception
+	 */
 	@Operation(summary = "File Processing Java NIO Async Read Local Content", description = "File Processing Java NIO")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200",
@@ -357,6 +364,33 @@ public class FileControllerImpl extends AbstractController {
 			throw new DataNotFoundException("FILE NIO Error: "+e.getMessage());
 		}
 	}
+
+	@Operation(summary = "File Processing Java NIO Sparse 1 GB File", description = "File Processing Java NIO")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					description = "Data Found!",
+					content = {@Content(mediaType = "application/json")}),
+			@ApiResponse(responseCode = "400",
+					description = "Unable to Find Data",
+					content = @Content)
+	})
+	@GetMapping("/nio/file/sparse/write/{fileName}/show/{showFile}")
+	public ResponseEntity<StandardResponse> createSparseFile(
+			@PathVariable("fileName")String fileName,
+			@PathVariable("showFile")boolean showFile) throws Exception {
+		// Read the File from the Resource Folder
+		log.debug("|"+name()+"|Security IO: Request to Create Sparse 1 GB File ("+fileName+")");
+		try {
+			StringBuilder sb = fileNIOExample.createSparseFile(fileName,showFile);
+			StandardResponse stdResponse = createSuccessResponse("File NIO Sparse File 1 GB Created!");
+			stdResponse.setPayload(getContent(sb));
+			return ResponseEntity.ok(stdResponse);
+		} catch (Exception e) {
+			log.error("|"+name()+"|File NIO Error Occurred: "+e.getMessage());
+			throw new DataNotFoundException("FILE NIO Error: "+e.getMessage());
+		}
+	}
+
 
 	/**
 	 * Read the Content From StringBuilder and Transform into ArrayList
