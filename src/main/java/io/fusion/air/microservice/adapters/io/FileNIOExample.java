@@ -205,21 +205,19 @@ public class FileNIOExample  extends AbstractFileProcessing {
         try (FileChannel fileChannel = FileChannel.open(Paths.get(fileName), StandardOpenOption.READ)) {
             MappedByteBuffer buffer = fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, fileChannel.size());
             CharBuffer charBuffer = StandardCharsets.UTF_8.decode(buffer);
-
             // Disable File Showing for large files
             if(fileChannel.size() > 1024000) {
                 showFile = false;
             }
-
             /**
-            try (Scanner scanner = new Scanner(charBuffer)) {
-                while (scanner.hasNextLine()) {
-                    String line = scanner.nextLine();
-                    if(showFile) {
+             try (Scanner scanner = new Scanner(charBuffer)) {
+                 while (scanner.hasNextLine()) {
+                     String line = scanner.nextLine();
+                     if(showFile) {
                         sb.append(line).append(System.lineSeparator());
-                    }
-                }
-            }
+                     }
+                 }
+             }
              */
             int start = 0;
             for (int end = 0; end < charBuffer.length(); end++) {
@@ -292,7 +290,6 @@ public class FileNIOExample  extends AbstractFileProcessing {
             e.printStackTrace();
             map.put("Write Error", e.getMessage());
         }
-
         // Reading from a file using Files.readAllBytes() method
         try {
             byte[] bytes = Files.readAllBytes(path);
@@ -302,9 +299,7 @@ public class FileNIOExample  extends AbstractFileProcessing {
         } catch (IOException e) {
             e.printStackTrace();
             map.put("Read Error", e.getMessage());
-
         }
-
         // Deleting a file using Files.delete() method
         try {
             Files.delete(path);

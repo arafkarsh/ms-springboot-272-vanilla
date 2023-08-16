@@ -60,6 +60,7 @@ import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 
+import java.security.Policy;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -131,6 +132,25 @@ public class ServiceBootStrap {
 			e.printStackTrace();
 		}
 	}
+
+	/**
+	@PostConstruct
+	public void init() {
+		// Set the security policy relative to the current working directory
+		String currentDir = System.getProperty("user.dir");
+		System.setProperty("java.security.policy", currentDir + "/vanilla.policy");
+
+		// Refresh the policy
+		Policy currentPolicy = Policy.getPolicy();
+		Policy.setPolicy(currentPolicy);
+
+		// Activate the security manager
+		if (System.getSecurityManager() == null) {
+			System.setSecurityManager(new SecurityManager());
+		}
+	}
+	 */
+
 
 	/**
 	 * Restart the Server

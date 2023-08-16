@@ -17,4 +17,6 @@ echo "App running with profile = $runMode"
 
 # Run Java command
 echo "java -jar target/ms-vanilla-service-*-spring-boot.jar --spring.profiles.active=$runMode"
-java -jar target/ms-vanilla-service-*-spring-boot.jar --spring.profiles.active=$runMode
+#java -Djava.security.policy=./vanilla.policy -jar target/ms-vanilla-service-*-spring-boot.jar --spring.profiles.active=$runMode
+#java -Dlogging.level.org.springframework.aop.framework=DEBUG -jar target/ms-vanilla-service-*-spring-boot.jar --spring.profiles.active=$runMode
+java -jar target/ms-vanilla-service-*-spring-boot.jar --spring.profiles.active=$runMode  -Djava.security.manager=java.lang.SecurityManager -Djava.security.policy=./vanilla.policy
