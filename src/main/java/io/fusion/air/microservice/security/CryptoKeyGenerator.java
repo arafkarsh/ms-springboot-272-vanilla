@@ -216,7 +216,7 @@ public class CryptoKeyGenerator {
      * @param _description
      * @return
      */
-    private String convertKeyToText(Key _key, String _description){
+    public String convertKeyToText(Key _key, String _description){
         if(_key == null || _description == null) {
             return "";
         }

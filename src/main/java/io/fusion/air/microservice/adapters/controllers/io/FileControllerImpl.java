@@ -50,15 +50,14 @@ import static org.slf4j.LoggerFactory.getLogger;
  *
  * @author arafkarsh
  * @version 1.0
- * @See FixedControllerImpl
  */
 @CrossOrigin
 @Configuration
 @RestController
 // "/ms-cache/api/v1"
-@RequestMapping("${service.api.path}/security")
+@RequestMapping("${service.api.path}/")
 @RequestScope
-@Tag(name = "Security IO", description = "File IO, Streams, Readers, NIO, Security Manager etc.")
+@Tag(name = "File IO", description = "File IO, Streams, Readers, NIO, NIO 2, Security Manager etc.")
 public class FileControllerImpl extends AbstractController {
 
 	// Set Logger -> Lookup will automatically determine the class name.

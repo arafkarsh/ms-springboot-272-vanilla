@@ -258,6 +258,7 @@ public class FileNIOExample  extends AbstractFileProcessing {
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                     // System.out.println(file);
                     files.add(file.toString());
+                    // Process the Files (using file Path)
                     return FileVisitResult.CONTINUE;
                 }
 
