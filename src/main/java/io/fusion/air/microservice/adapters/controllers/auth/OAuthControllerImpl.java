@@ -60,7 +60,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 // "/ms-cache/api/v1"
 @RequestMapping("${service.api.path}/auth")
 @RequestScope
-@Tag(name = "Authentication", description = "OAuth2 Security Authentication, JWT Access, Refresh & Tx Tokens")
+@Tag(name = "Authentication", description = "KeyCloak, OAuth2 Security Authentication, JWT Access, Refresh & Tx Tokens")
 public class OAuthControllerImpl extends AbstractController {
 
 	// Set Logger -> Lookup will automatically determine the class name.
