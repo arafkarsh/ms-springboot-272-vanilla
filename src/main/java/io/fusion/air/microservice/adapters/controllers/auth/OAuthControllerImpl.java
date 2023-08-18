@@ -17,6 +17,7 @@ package io.fusion.air.microservice.adapters.controllers.auth;
 // Custom
 import com.fasterxml.jackson.databind.JsonNode;
 import io.fusion.air.microservice.adapters.security.KeyCloakService;
+import io.fusion.air.microservice.adapters.security.SingleTokenAuthorizationRequired;
 import io.fusion.air.microservice.domain.models.auth.Token;
 import io.fusion.air.microservice.domain.models.auth.UserCredentials;
 import io.fusion.air.microservice.domain.models.core.StandardResponse;
@@ -27,6 +28,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 // Spring Framework
 import org.springframework.beans.factory.annotation.Autowired;
@@ -134,7 +136,6 @@ public class OAuthControllerImpl extends AbstractController {
 		return ResponseEntity.ok(stdResponse);
 	}
 
-
 	/**
 	 * Get the Public Key (PEM) from KeyCloak to verify the JWT Token
 	 * @return
@@ -154,6 +155,24 @@ public class OAuthControllerImpl extends AbstractController {
 		String publicKey = keyCloakService.getPublicKeyPEMFormat();
 		StandardResponse stdResponse = createSuccessResponse("Retrieved Public Key Successfully");
 		stdResponse.setPayload(publicKey);
+		return ResponseEntity.ok(stdResponse);
+	}
+
+	@SingleTokenAuthorizationRequired(role="user")
+	@Operation(summary = "Test the KeyCloak Token Validation using Public Key", security = { @SecurityRequirement(name = "bearer-key") })
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					description = "Token Tested Successfully",
+					content = {@Content(mediaType = "application/json")}),
+			@ApiResponse(responseCode = "404",
+					description = "Unable to Test the token",
+					content = @Content)
+	})
+	@GetMapping("/keycloak/token/test")
+	public ResponseEntity<StandardResponse> testToken() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+		log.debug("|"+name()+"|Request to Test the KeyCloak Token ");
+		StandardResponse stdResponse = createSuccessResponse("Token Tested Successfully");
+		stdResponse.setPayload("Token Tested Successfully");
 		return ResponseEntity.ok(stdResponse);
 	}
  }

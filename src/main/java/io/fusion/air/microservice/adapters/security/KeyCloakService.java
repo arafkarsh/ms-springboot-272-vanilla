@@ -30,8 +30,12 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
@@ -99,7 +103,7 @@ public class KeyCloakService {
      */
     public JsonNode getPublicKeyFromKeycloak() throws IOException {
         // Assuming the key info is in a "keys" array
-        return new ObjectMapper().readTree(getPublicKey()).get("keys").get(0);
+        return new ObjectMapper().readTree(getPublicKey()).get("keys").get(1);
     }
 
     /**
@@ -109,9 +113,27 @@ public class KeyCloakService {
      * @throws NoSuchAlgorithmException
      * @throws InvalidKeySpecException
      */
-    public String getPublicKeyPEMFormat() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        RSAPublicKey key = createRSAKey();
-        return cryptoKeyGenerator.convertKeyToText(key, "RSA PUBLIC KEY");
+    public String getPublicKeyPEMFormat()  {
+        Path filePath = Paths.get(keyCloakConfig.getKeyCloakPublicKey());
+        RSAPublicKey key = null;
+        String keyName = "RSA PUBLIC KEY";
+        if (Files.exists(filePath)) {
+            try {
+                key = cryptoKeyGenerator.readPublicKey(new File(keyCloakConfig.getKeyCloakPublicKey()));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            // File Doesnt Exist - Create the File
+            try {
+                key = createRSAKey();
+            } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
+                throw new RuntimeException(e);
+            }
+            cryptoKeyGenerator.setPublicKeyFromKeyCloak(key);
+            cryptoKeyGenerator.writePEMFile(key, keyCloakConfig.getKeyCloakPublicKey(), keyName);
+        }
+        return cryptoKeyGenerator.convertKeyToText(key, keyName);
     }
 
     /**

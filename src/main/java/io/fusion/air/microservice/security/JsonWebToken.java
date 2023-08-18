@@ -16,11 +16,17 @@
 
 package io.fusion.air.microservice.security;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.*;
+import java.security.interfaces.RSAPublicKey;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Function;
 
+import io.fusion.air.microservice.server.config.KeyCloakConfig;
 import io.fusion.air.microservice.server.config.ServiceConfiguration;
 import io.jsonwebtoken.*;
 
@@ -70,9 +76,13 @@ public final class JsonWebToken {
 
 	public static final int SECRET_KEY 				= 1;
 	public static final int PUBLIC_KEY				= 2;
+	public static final int KEYCLOAK_PUBLIC_KEY		= 3;
 
 	@Autowired
 	private ServiceConfiguration serviceConfig;
+
+	@Autowired
+	private KeyCloakConfig keycloakConfig;
 
 	@Autowired
 	private CryptoKeyGenerator cryptoKeys;
@@ -154,6 +164,35 @@ public final class JsonWebToken {
 				System.out.println("Public key format: " + getCryptoKeyGenerator().getPublicKey().getFormat());
 				System.out.println(getCryptoKeyGenerator().getPublicKeyPEMFormat());
 				break;
+		}
+	}
+
+	/**
+	 * Set the Validator Key as KeyCloak Public Key
+	 */
+	public void setKeyCloakPublicKey() {
+		if(keycloakConfig.isKeyCloakEnabled()) {
+			Path filePath = Paths.get(keycloakConfig.getKeyCloakPublicKey());
+			RSAPublicKey key = null;
+			String keyName = "RSA PUBLIC KEY";
+			if (Files.exists(filePath)) {
+				try {
+					getCryptoKeyGenerator()
+						.setPublicKeyFromKeyCloak(
+							getCryptoKeyGenerator()
+							.readPublicKey(new File(keycloakConfig.getKeyCloakPublicKey()))
+						);
+					issuer = keycloakConfig.getKeyCloakIssuer();
+					validatorKey = getCryptoKeyGenerator().getPublicKey();
+					String pem = getCryptoKeyGenerator().convertKeyToText(validatorKey, keyName);
+
+					System.out.println("KeyCloak Public Key Set. Issuer = "+issuer);
+					System.out.println(pem);
+				} catch (Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+
 		}
 	}
 

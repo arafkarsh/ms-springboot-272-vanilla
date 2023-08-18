@@ -17,8 +17,10 @@ package io.fusion.air.microservice.adapters.security;
 
 import io.fusion.air.microservice.domain.exceptions.*;
 import io.fusion.air.microservice.security.JsonWebToken;
+import io.fusion.air.microservice.server.config.KeyCloakConfig;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -65,6 +67,9 @@ public class AuthorizeRequestAspect {
     public final static int CONSUMERS           = 1;
     public final static int INTERNAL_SERVICES   = 2;
     public final static int EXTERNAL_SERVICES   = 3;
+
+    @Autowired
+    private KeyCloakConfig keyCloakConfig;
 
     @Autowired
     private JsonWebToken jwtUtil;
@@ -232,11 +237,14 @@ public class AuthorizeRequestAspect {
         } catch (ExpiredJwtException e) {
             msg = "Access Denied: JWT Token has expired Error: "+e.getMessage();
             throw new JWTTokenExpiredException(msg, e);
+        } catch (SignatureException e) {
+            msg = "Access Denied: Invalid JWT Signature: "+e.getMessage();
+            throw new JWTInvalidSignatureException(msg, e);
         } catch (NullPointerException e) {
             msg = "Access Denied: Invalid Token (Null Token) Error: "+e.getMessage();
             throw new JWTUnDefinedException(msg, e);
         } catch (Throwable e) {
-            msg = "Access Denied: Error:  "+e.getMessage();
+            msg = "Access Denied: ERROR  "+e.getMessage();
             throw new JWTUnDefinedException(msg, e);
         } finally {
             if(msg != null) {
@@ -337,32 +345,35 @@ public class AuthorizeRequestAspect {
                 tokenType = (String) claims.get("type");
             } catch (Exception e) {
             }
-            if (tokenType == null) {
-                msg = "Invalid Token Type from Claims! " + user;
-                throw new AuthorizationException(msg);
-            }
-            switch(tokenCtg) {
-                case CONSUMERS:
-                    if (tokenKey.equals(AUTH_TOKEN) && !tokenType.equals(AUTH)) {
-                        msg = "Invalid Auth Token! ("+tokenType+")  For " + user;
-                        throw new AuthorizationException(msg);
-                    } else if (tokenKey.equals(REFRESH_TOKEN) && !tokenType.equals(AUTH_REFRESH)) {
-                        msg = "Invalid Refresh Token! " + user;
-                        throw new AuthorizationException(msg);
-                    }
-                    break;
-                case INTERNAL_SERVICES:
-                    if (tokenKey.equals(AUTH_TOKEN) && !tokenType.equals(TX_SERVICE )) {
-                        msg = "Invalid Auth Token ("+tokenType+") For Internal Service! " + user;
-                        throw new AuthorizationException(msg);
-                    }
-                    break;
-                case EXTERNAL_SERVICES:
-                    if (tokenKey.equals(AUTH_TOKEN) && !tokenType.equals(TX_EXTERNAL )) {
-                        msg = "Invalid Auth Token ("+tokenType+") For External! " + user;
-                        throw new AuthorizationException(msg);
-                    }
-                    break;
+            // Check the Token Type Only for Non KeyCloak Tokens
+            if(!keyCloakConfig.isKeyCloakEnabled()) {
+                if (tokenType == null) {
+                    msg = "Invalid Token Type from Claims! " + user;
+                    throw new AuthorizationException(msg);
+                }
+                switch (tokenCtg) {
+                    case CONSUMERS:
+                        if (tokenKey.equals(AUTH_TOKEN) && !tokenType.equals(AUTH)) {
+                            msg = "Invalid Auth Token! (" + tokenType + ")  For " + user;
+                            throw new AuthorizationException(msg);
+                        } else if (tokenKey.equals(REFRESH_TOKEN) && !tokenType.equals(AUTH_REFRESH)) {
+                            msg = "Invalid Refresh Token! " + user;
+                            throw new AuthorizationException(msg);
+                        }
+                        break;
+                    case INTERNAL_SERVICES:
+                        if (tokenKey.equals(AUTH_TOKEN) && !tokenType.equals(TX_SERVICE)) {
+                            msg = "Invalid Auth Token (" + tokenType + ") For Internal Service! " + user;
+                            throw new AuthorizationException(msg);
+                        }
+                        break;
+                    case EXTERNAL_SERVICES:
+                        if (tokenKey.equals(AUTH_TOKEN) && !tokenType.equals(TX_EXTERNAL)) {
+                            msg = "Invalid Auth Token (" + tokenType + ") For External! " + user;
+                            throw new AuthorizationException(msg);
+                        }
+                        break;
+                }
             }
         } finally {
             // Error is Logged ONLY if msg != NULL

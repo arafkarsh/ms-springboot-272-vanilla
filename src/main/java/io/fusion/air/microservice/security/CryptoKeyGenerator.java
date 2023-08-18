@@ -65,6 +65,12 @@ public class CryptoKeyGenerator {
     public CryptoKeyGenerator() {
     }
 
+    public void setPublicKeyFromKeyCloak(Key key) {
+        if(key != null) {
+            publicKey = (PublicKey) key;
+        }
+    }
+
     /**
      * Set the Crypto Key File Names
      * @param _publicKeyFile

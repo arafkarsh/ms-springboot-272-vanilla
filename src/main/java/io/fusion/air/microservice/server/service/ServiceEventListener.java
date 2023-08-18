@@ -86,6 +86,7 @@ public class ServiceEventListener {
 			log.debug("Generate Test Tokens = {} ", serverTokenTest);
 			generateTestToken();
 		}
+		jsonWebToken.setKeyCloakPublicKey();
 	}
 
 	/**

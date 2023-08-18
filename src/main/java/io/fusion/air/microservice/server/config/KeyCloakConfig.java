@@ -1,5 +1,5 @@
 /**
- * (C) Copyright 2022 Araf Karsh Hamid
+ * (C) Copyright 2023 Araf Karsh Hamid
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,15 @@ public class KeyCloakConfig implements Serializable {
     @Value("${server.keycloak.enabled}")
     private boolean keyCloakEnabled;
 
+    @Value("${server.keycloak.publicKey}")
+    private String keyCloakPublicKey;
+
+    @Value("${server.keycloak.issuer}")
+    private String keyCloakIssuer;
+
+    public KeyCloakConfig() {
+    }
+
     public String getKeyCloakUrl() {
         return keyCloakUrl;
     }
@@ -78,5 +87,13 @@ public class KeyCloakConfig implements Serializable {
 
     public boolean isKeyCloakEnabled() {
         return keyCloakEnabled;
+    }
+
+    public String getKeyCloakPublicKey() {
+        return keyCloakPublicKey;
+    }
+
+    public String getKeyCloakIssuer() {
+        return keyCloakIssuer;
     }
 }
