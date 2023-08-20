@@ -80,6 +80,15 @@ public class TokenManager {
     }
 
     /**
+     * Returns TX Token
+     * @param _subject
+     * @return
+     */
+    public String createTXToken(String _subject, HttpHeaders headers) {
+        return createTXToken(_subject, TX_USERS, headers);
+    }
+
+    /**
      * Create TX-Token with Subject, Token Type and Add to Header
      *
      * @param _subject

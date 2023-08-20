@@ -16,8 +16,10 @@
 package io.fusion.air.microservice.adapters.controllers.auth;
 // Custom
 import com.fasterxml.jackson.databind.JsonNode;
+import io.fusion.air.microservice.adapters.security.AuthorizationRequired;
 import io.fusion.air.microservice.adapters.security.KeyCloakService;
 import io.fusion.air.microservice.adapters.security.SingleTokenAuthorizationRequired;
+import io.fusion.air.microservice.adapters.security.TokenManager;
 import io.fusion.air.microservice.domain.models.auth.Token;
 import io.fusion.air.microservice.domain.models.auth.UserCredentials;
 import io.fusion.air.microservice.domain.models.core.StandardResponse;
@@ -33,6 +35,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 // Spring Framework
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.RequestScope;
@@ -72,6 +76,9 @@ public class OAuthControllerImpl extends AbstractController {
 	@Autowired
 	private KeyCloakService keyCloakService;
 
+	@Autowired
+	private TokenManager tokenManager;
+
 
 	/**
 	 * Authenticate User
@@ -91,8 +98,16 @@ public class OAuthControllerImpl extends AbstractController {
 		Token token = keyCloakService.authenticateUser(_user.getUserId(), _user.getPassword());
 		StandardResponse stdResponse = createSuccessResponse("User Authenticated Successfully");
 		stdResponse.setPayload(token);
-		return ResponseEntity.ok(stdResponse);
-	}
+		// Add Tokens (from KeyCloak) to Headers
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Bearer "+token.getAccessToken());
+		headers.add("Refresh-Token", "Bearer "+token.getRefreshToken());
+
+		// Create the TX Token (As part of User Service) and set it in the Header
+		tokenManager.createTXToken(_user.getUserId(), headers);
+
+		// Return the response entity with the custom headers and body
+		return new ResponseEntity<StandardResponse>(stdResponse, headers, HttpStatus.OK);	}
 
 	/**
 	 * Logout User
@@ -159,6 +174,7 @@ public class OAuthControllerImpl extends AbstractController {
 	}
 
 	@SingleTokenAuthorizationRequired(role="user")
+	// @AuthorizationRequired(role = "user")
 	@Operation(summary = "Test the KeyCloak Token Validation using Public Key", security = { @SecurityRequirement(name = "bearer-key") })
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200",

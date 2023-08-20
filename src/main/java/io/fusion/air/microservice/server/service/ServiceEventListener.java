@@ -146,8 +146,6 @@ public class ServiceEventListener {
 		log.info("\nAdmin Token Expiry in Days:Hours:Mins  {}", JsonWebToken.printExpiryTime(txTokenExpiry));
 		return jsonWebToken
 				.init(serviceConfig.getTokenType())
-				.setSubject(subject)
-				.setIssuer(serviceConfig.getServiceOrg())
 				.generateToken( subject,  serviceConfig.getServiceOrg(),  txTokenExpiry,  claims);
 	}
 

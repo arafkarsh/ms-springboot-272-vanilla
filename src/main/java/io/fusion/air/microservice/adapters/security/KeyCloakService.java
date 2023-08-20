@@ -107,6 +107,25 @@ public class KeyCloakService {
     }
 
     /**
+     * Create the RSA Key from the KeyCloak Public Key
+     * @return
+     * @throws IOException
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeySpecException
+     */
+    public RSAPublicKey createRSAKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+        JsonNode keyData = getPublicKeyFromKeycloak();
+        String modulusBase64 = keyData.get("n").asText();
+        String exponentBase64 = keyData.get("e").asText();
+
+        BigInteger modulus = new BigInteger(1, Base64.getUrlDecoder().decode(modulusBase64));
+        BigInteger publicExponent = new BigInteger(1, Base64.getUrlDecoder().decode(exponentBase64));
+
+        return (RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(new RSAPublicKeySpec(modulus, publicExponent));
+    }
+
+
+    /**
      * Return the Public Key in PEM Format
      * @return
      * @throws IOException
@@ -136,22 +155,5 @@ public class KeyCloakService {
         return cryptoKeyGenerator.convertKeyToText(key, keyName);
     }
 
-    /**
-     * Create the RSA Key from the KeyCloak Public Key
-     * @return
-     * @throws IOException
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidKeySpecException
-     */
-    public RSAPublicKey createRSAKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        JsonNode keyData = getPublicKeyFromKeycloak();
-        String modulusBase64 = keyData.get("n").asText();
-        String exponentBase64 = keyData.get("e").asText();
-
-        BigInteger modulus = new BigInteger(1, Base64.getUrlDecoder().decode(modulusBase64));
-        BigInteger publicExponent = new BigInteger(1, Base64.getUrlDecoder().decode(exponentBase64));
-
-        return (RSAPublicKey) KeyFactory.getInstance("RSA").generatePublic(new RSAPublicKeySpec(modulus, publicExponent));
-    }
 
 }

@@ -5,7 +5,7 @@
 		"description": "<b>MS-Vanilla Service </b><br>Build No:<b> 14</b>, Build Date:<b> Wed Aug 2 11:57:02 IST 2023</b> ",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "4414585",
-		"_collection_link": "https://fusion-amexio.postman.co/workspace/Fusion-Workspace~72c2b47e-5c3b-4d72-b39b-15a0ac062747/collection/4414585-63d13169-a1a2-4079-b9b5-fee0d21f3125?action=share&creator=4414585&source=collection_link"
+		"_collection_link": "https://fusion-amexio.postman.co/workspace/Fusion-Workspace~72c2b47e-5c3b-4d72-b39b-15a0ac062747/collection/4414585-63d13169-a1a2-4079-b9b5-fee0d21f3125?action=share&source=collection_link&creator=4414585"
 	},
 	"item": [
 		{
@@ -10608,7 +10608,7 @@
 				"header": [
 					{
 						"key": "x-csrf-token",
-						"value": "5a6dd68e-5ac0-4640-a3d7-337f80f603ed",
+						"value": "ecdd8534-0df0-4d11-baf0-6f2dc365d9b5",
 						"type": "text"
 					}
 				],
@@ -10633,12 +10633,156 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "http://localhost:9089/ms-vanilla/api/v1/auth/keycloak/login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"Authorization\", pm.response.headers.get('Authorization'));",
+							"pm.environment.set(\"Refresh-Token\", pm.response.headers.get('Refresh-Token'));",
+							"pm.environment.set(\"TX-Token\", pm.response.headers.get('TX-Token'));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"userId\": \"john.doe\",\n  \"password\": \"2023.Doe\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9089/ms-vanilla/api/v1/auth/keycloak/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9089",
+					"path": [
+						"ms-vanilla",
+						"api",
+						"v1",
+						"auth",
+						"keycloak",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "localhost:8080/realms/Fusion-Air/protocol/openid-connect/certs",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/realms/Fusion-Air/protocol/openid-connect/certs",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"realms",
+						"Fusion-Air",
+						"protocol",
+						"openid-connect",
+						"certs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:9089/ms-vanilla/api/v1/auth/keycloak/token/test",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{Authorization}}",
+						"type": "text"
+					},
+					{
+						"key": "Refresh-Token",
+						"value": "{{Refresh-Token}}",
+						"type": "text"
+					},
+					{
+						"key": "TX-Token",
+						"value": "{{TX-Token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:9089/ms-vanilla/api/v1/auth/keycloak/token/test",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9089",
+					"path": [
+						"ms-vanilla",
+						"api",
+						"v1",
+						"auth",
+						"keycloak",
+						"token",
+						"test"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"variable": [
 		{
 			"key": "baseUrl",
 			"value": "http://localhost:9089"
+		},
+		{
+			"key": "Authorization",
+			"value": "{{Authorization}}"
 		}
 	]
 }

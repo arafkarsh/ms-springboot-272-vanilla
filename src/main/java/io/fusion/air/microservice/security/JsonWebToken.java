@@ -95,10 +95,8 @@ public final class JsonWebToken {
 	private SignatureAlgorithm algorithm;
 	public final static SignatureAlgorithm defaultAlgo = SignatureAlgorithm.HS512;
 
-	private final Map<String, Object> claimsToken;
-	private final Map<String, Object> claimsRefreshToken;
 	private String issuer;
-	private String subject;
+
 	private long tokenAuthExpiry;
 	private long tokenRefreshExpiry;
 
@@ -106,8 +104,6 @@ public final class JsonWebToken {
 	 * Initialize the JWT with the Signature Algorithm based on Secret Key or Public / Private Key
 	 */
 	public JsonWebToken() {
-		claimsToken 		= new HashMap<String, Object>();
-		claimsRefreshToken 	= new HashMap<String, Object>();
 	}
 
 	/**
@@ -133,8 +129,8 @@ public final class JsonWebToken {
 		// Create the Key based on Secret Key or Private Key
 		createSigningKey();
 
-		issuer				= (serviceConfig != null) ? serviceConfig.getServiceOrg() : "metarivu";
-		subject 			= "jane.doe";
+		issuer				= (serviceConfig != null) ? serviceConfig.getServiceOrg() : "fusion-air";
+
 		setTokenAuthExpiry((serviceConfig != null) ? serviceConfig.getTokenAuthExpiry() : EXPIRE_IN_FIVE_MINS );
 		setTokenRefreshExpiry((serviceConfig != null) ? serviceConfig.getTokenRefreshExpiry() : EXPIRE_IN_THIRTY_MINS );
 		return this;
@@ -252,16 +248,6 @@ public final class JsonWebToken {
 	}
 
 	/**
-	 * Set the Subject
-	 * @param _subject
-	 * @return
-	 */
-	public JsonWebToken setSubject(String _subject)   {
-		subject = _subject;
-		return this;
-	}
-
-	/**
 	 * Set the Token Expiry Time - MUST NOT BE GREATER THAN 30 MINS
 	 * IF YES THEN SET EXPIRY TO 5 MINS
 	 * @param _time
@@ -300,14 +286,14 @@ public final class JsonWebToken {
 	 * @param _claims
 	 * @return
 	 */
-	public JsonWebToken addAllTokenClaims(Map<String, Object> _claims) {
-		claimsToken.clear();
+	public HashMap<String, Object> addAllTokenClaims(Map<String, Object> _claims) {
+		HashMap<String, Object> claimsToken = new HashMap<String, Object>();
 		claimsToken.putAll(_claims);
 		String aud = (serviceConfig != null) ? serviceConfig.getServiceName() : "general";
 		claimsToken.putIfAbsent("aud", aud);
 		claimsToken.putIfAbsent("jti", UUID.randomUUID().toString());
 		claimsToken.putIfAbsent("rol", "User");
-		return this;
+		return claimsToken;
 	}
 
 	/**
@@ -315,14 +301,14 @@ public final class JsonWebToken {
 	 * @param _claims
 	 * @return
 	 */
-	public JsonWebToken addAllRefreshTokenClaims(Map<String, Object> _claims) {
-		claimsRefreshToken.clear();
+	public HashMap<String, Object> addAllRefreshTokenClaims(Map<String, Object> _claims) {
+		HashMap<String, Object> claimsRefreshToken 	= new HashMap<String, Object>();
 		claimsRefreshToken.putAll(_claims);
 		String aud = (serviceConfig != null) ? serviceConfig.getServiceName() : "general";
 		claimsRefreshToken.putIfAbsent("aud", aud);
 		claimsRefreshToken.putIfAbsent("jti", UUID.randomUUID().toString());
 		claimsRefreshToken.putIfAbsent("rol", "User");
-		return this;
+		return claimsRefreshToken;
 	}
 
 	/**
@@ -337,12 +323,10 @@ public final class JsonWebToken {
 	 * 									.setIssuer("company")
 	 * 									.setTokenExpiry(JsonWebToken.EXPIRE_IN_FIVE_MINS)
 	 * 									.setTokenRefreshExpiry(JsonWebToken.EXPIRE_IN_THIRTY_MINS)
-	 * 									.addAllTokenClaims(Map<String,Object> claims)
-	 * 									.addAllRefreshTokenClaims(Map<String,Object> claims)
-	 * 									generateTokens()
+	 * 									generateTokens(Map<String,Object> claimsToken, Map<String,Object> claimsRefreshToken)
 	 * @return
 	 */
-	public HashMap<String,String>  generateTokens() {
+	public HashMap<String,String>  generateTokens(String subject, Map<String,Object> claimsToken, Map<String,Object> claimsRefreshToken) {
 		HashMap<String, String> tokens  = new HashMap<String, String>();
 		String tokenAuth 	= generateToken(subject, issuer, tokenAuthExpiry, claimsToken);
 		String tokenRefresh = generateToken(subject, issuer, tokenRefreshExpiry, claimsRefreshToken);
@@ -366,7 +350,8 @@ public final class JsonWebToken {
 	 * @param claimsRefreshToken
 	 * @return
 	 */
-	public HashMap<String,String>  generateTokens(String subject, String issuer, Map<String,Object> claimsToken, Map<String,Object> claimsRefreshToken) {
+	public HashMap<String,String>  generateTokens(String subject, String issuer,
+												  Map<String,Object> claimsToken, Map<String,Object> claimsRefreshToken) {
 		claimsToken = addDefaultClaims(claimsToken);
 		claimsRefreshToken = addDefaultClaims(claimsRefreshToken);
 		HashMap<String, String> tokens  = new HashMap<String, String>();
@@ -377,15 +362,6 @@ public final class JsonWebToken {
 		return tokens;
 	}
 
-	/**
-	 * Clear All Claims (Token and Refresh Token)
-	 * @return
-	 */
-	public JsonWebToken clearAllClaims()  {
-		claimsToken.clear();
-		claimsRefreshToken.clear();
-		return this;
-	}
 
 	/**
 	 * Returns the Algorithm
@@ -559,32 +535,6 @@ public final class JsonWebToken {
 		String role = (String) claims.get("rol");
 		return (role == null) ? "Public" : role;
 	}
-    
-    /**
-     * Return Payload as JSON String
-     * 
-     * @param _token
-     * @return
-     */
-    public String getPayload(String _token) {
-    	StringBuilder sb = new StringBuilder();
-		Claims claims = getAllClaims(_token);
-		int x=1;
-		int size=claims.size();
-		sb.append("{");
-		for(Entry<String, Object> claim : claims.entrySet()) {
-			if(claim != null) {
-				sb.append("\""+claim.getKey()+"\": \"").append(claim.getValue());
-				sb.append("\"");
-				if(x<size) {
-					sb.append(",");
-				}
-			}
-			x++;
-		}
-		sb.append("}");
-    	return sb.toString();
-    }
 
     /**
      * Get a Claim from the Token based on the Claim Type
@@ -629,6 +579,33 @@ public final class JsonWebToken {
 				.build()
 				.parseClaimsJws(_token);
 	}
+
+	/**
+	 * Return Payload as JSON String
+	 *
+	 * @param _token
+	 * @return
+	 */
+	public String getPayload(String _token) {
+		StringBuilder sb = new StringBuilder();
+		Claims claims = getAllClaims(_token);
+		int x=1;
+		int size=claims.size();
+		sb.append("{");
+		for(Entry<String, Object> claim : claims.entrySet()) {
+			if(claim != null) {
+				sb.append("\""+claim.getKey()+"\": \"").append(claim.getValue());
+				sb.append("\"");
+				if(x<size) {
+					sb.append(",");
+				}
+			}
+			x++;
+		}
+		sb.append("}");
+		return sb.toString();
+	}
+
 	/**
 	 * Print Token Stats
 	 * @param token
@@ -703,35 +680,11 @@ public final class JsonWebToken {
 	}
 
 	/**
-	 * Returns Token Claims Set for Generating the Token
-	 * @return
-	 */
-	public Map<String, Object> getClaimsToken() {
-		return claimsToken;
-	}
-
-	/**
-	 * Returns the Token Claims set for Generating the Refresh Token
-	 * @return
-	 */
-	public Map<String, Object> getClaimsRefreshToken() {
-		return claimsRefreshToken;
-	}
-
-	/**
 	 * Get the Issuer Set for Generating Token / Refresher Token
 	 * @return
 	 */
 	public String getIssuer() {
 		return issuer;
-	}
-
-	/**
-	 * Get the Subject Set for Generating Token / Refresher Token
-	 * @return
-	 */
-	public String getSubject() {
-		return subject;
 	}
 
 	/**
@@ -765,7 +718,7 @@ public final class JsonWebToken {
 		long tokenRefreshExpiry = JsonWebToken.EXPIRE_IN_THIRTY_MINS;
 
 		String subject	 = "jane.doe";
-		String issuer    = "metarivu.com";
+		String issuer    = "fusion-air";
 
 		Map<String, Object> claims = new HashMap<>();
 		claims.put("aud", "generic");
@@ -776,13 +729,9 @@ public final class JsonWebToken {
 
 		HashMap<String,String> tokens = jsonWebToken
 				.init(_tokenType)
-				.setSubject(subject)
-				.setIssuer(issuer)
 				.setTokenAuthExpiry(tokenAuthExpiry)
 				.setTokenRefreshExpiry(tokenRefreshExpiry)
-				.addAllTokenClaims(claims)
-				.addAllRefreshTokenClaims(claims)
-				.generateTokens();
+				.generateTokens(subject, issuer, claims, claims);
 
 		String token = tokens.get("token");
 		String refresh = tokens.get("refresh");
