@@ -233,7 +233,7 @@ public class ExceptionHandlerAdvice extends ResponseEntityExceptionHandler {
     }
 
     /**
-     * Authorization Exception
+     * Security Exception
      * @param _adEx
      * @param _request
      * @return
