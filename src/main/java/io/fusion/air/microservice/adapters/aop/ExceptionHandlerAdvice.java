@@ -240,7 +240,7 @@ public class ExceptionHandlerAdvice extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(value = SecurityException.class)
     public ResponseEntity<Object> securityException(SecurityException _adEx, WebRequest _request) {
-        return createErrorResponse(_adEx,  "411",  _request);
+        return createErrorResponse(_adEx,  "413",  _request);
     }
 
     /**
@@ -251,7 +251,7 @@ public class ExceptionHandlerAdvice extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(value = AuthorizationException.class)
     public ResponseEntity<Object> authorizationException(AuthorizationException _adEx,  WebRequest _request) {
-        return createErrorResponse(_adEx,  "413", _request);
+        return createErrorResponse(_adEx,  "411", _request);
     }
 
     /**
