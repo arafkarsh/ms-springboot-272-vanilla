@@ -288,6 +288,17 @@ public class ExceptionHandlerAdvice extends ResponseEntityExceptionHandler {
     }
 
     /**
+     * JWT Invalid Signature Exception
+     * @param _adEx
+     * @param _request
+     * @return
+     */
+    @ExceptionHandler(value = JWTInvalidSignatureException.class)
+    public ResponseEntity<Object> JWTInvalidSignatureException(JWTInvalidSignatureException _adEx,  WebRequest _request) {
+        return createErrorResponse(_adEx,  "417",  _request);
+    }
+
+    /**
      * JWT UnDefined Exception
      * @param _adEx
      * @param _request
@@ -295,7 +306,7 @@ public class ExceptionHandlerAdvice extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(value = JWTUnDefinedException.class)
     public ResponseEntity<Object> JWTUnDefinedException(JWTUnDefinedException _adEx,  WebRequest _request) {
-        return createErrorResponse(_adEx,  "417",  _request);
+        return createErrorResponse(_adEx,  "429",  _request);
     }
 
     /**
