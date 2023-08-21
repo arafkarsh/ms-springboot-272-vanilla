@@ -17,6 +17,8 @@ package io.fusion.air.microservice.adapters.security;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.fusion.air.microservice.domain.exceptions.AuthorizationException;
+import io.fusion.air.microservice.domain.exceptions.SecurityException;
 import io.fusion.air.microservice.domain.models.auth.Token;
 import io.fusion.air.microservice.security.CryptoKeyGenerator;
 import io.fusion.air.microservice.server.config.KeyCloakConfig;
@@ -81,9 +83,15 @@ public class KeyCloakService {
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
 
         RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<Token> responseEntity = restTemplate.postForEntity(keyCloakConfig.getKeyCloakUrl(), request, Token.class);
+        try {
+            ResponseEntity<Token> responseEntity = restTemplate.postForEntity(keyCloakConfig.getKeyCloakUrl(), request, Token.class);
+            return responseEntity.getBody();
+        } catch (Exception e) {
+            // throw new SecurityException("Access Denied!", e);
+            throw new AuthorizationException("Access Denied!", e);
 
-        return responseEntity.getBody();
+        }
+
     }
 
     /**
