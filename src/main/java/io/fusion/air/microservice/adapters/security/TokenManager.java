@@ -80,6 +80,15 @@ public class TokenManager {
     }
 
     /**
+     * Returns the TX Token
+     * @param _subject
+     * @return
+     */
+    public String createTXToken(String _subject) {
+        return createTXToken(_subject, TX_USERS, null);
+    }
+
+    /**
      * Returns TX Token
      * @param _subject
      * @return
@@ -109,7 +118,6 @@ public class TokenManager {
         long txTokenExpiry = (tokenRefreshExpiry < 50) ? JsonWebToken.EXPIRE_IN_ONE_HOUR : tokenRefreshExpiry;
         String token = new JsonWebToken()
                             .init(serviceConfig.getTokenType())
-                            .setIssuer(serviceConfig.getServiceOrg())
                             .generateToken(_subject,  serviceConfig.getServiceOrg(),  txTokenExpiry,  claims);
 
         if(headers != null) {

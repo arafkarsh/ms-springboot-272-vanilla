@@ -89,9 +89,29 @@ public class KeyCloakService {
         } catch (Exception e) {
             // throw new SecurityException("Access Denied!", e);
             throw new AuthorizationException("Access Denied!", e);
-
         }
+    }
 
+    public Token refreshToken(String refreshToken) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "refresh_token");
+        params.add("client_id", keyCloakConfig.getKeyCloakClientId());
+        params.add("client_secret", keyCloakConfig.getKeyCloakSecret());
+        params.add("refresh_token", refreshToken);
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        try {
+            ResponseEntity<Token> responseEntity = restTemplate.postForEntity(keyCloakConfig.getKeyCloakUrl(), request, Token.class);
+            return responseEntity.getBody();
+        } catch (Exception e) {
+            // throw new SecurityException("Access Denied!", e);
+            throw new AuthorizationException("Access Denied!", e);
+        }
     }
 
     /**

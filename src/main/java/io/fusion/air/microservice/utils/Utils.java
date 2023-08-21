@@ -379,7 +379,7 @@ public final class Utils {
 	 * @return
 	 */
 	public static String createSecureCookie(String _key, String _value) {
-		return createSecureCookie("/", _key, _value, 3600);
+		return createSecureCookie( MDC.get("URI"), _key, _value, 3600);
 	}
 
 	/**
@@ -454,7 +454,7 @@ public final class Utils {
 	 * @return
 	 */
 	public static HttpHeaders createSecureCookieHeaders(HttpHeaders headers, String _key, String _value, int _age) {
-		return createSecureCookieHeaders(headers,"/", _key, _value, _age);
+		return createSecureCookieHeaders(headers,MDC.get("URI"), _key, _value, _age);
 	}
 
 	/**
@@ -471,8 +471,27 @@ public final class Utils {
 		if(headers == null) {
 			headers = new HttpHeaders();
 		}
+		if(_path == null) {
+			_path = MDC.get("URI");
+		}
 		headers.add(HttpHeaders.SET_COOKIE, createSecureCookie(_path, _key, _value, _age));
 		return headers;
+	}
+
+	/**
+	 * Returns the Cookie Map
+	 * @param request
+	 * @return
+	 */
+	public static HashMap<String, String> getCookieMap(HttpServletRequest request) {
+		Cookie[] cookies = request.getCookies();
+		HashMap<String, String> cookieMap = new HashMap<String, String>();
+		if(cookies != null) {
+			for(Cookie cookie : cookies) {
+				cookieMap.put(cookie.getName(), cookie.getValue());
+			}
+		}
+		return cookieMap;
 	}
 
 	/**
