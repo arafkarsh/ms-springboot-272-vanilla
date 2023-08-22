@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.MessageDigest;
+import java.security.*;
 import java.util.Base64;
 import java.util.Arrays;
 import java.util.UUID;
@@ -180,6 +180,20 @@ public class SecureData {
     }
 
     /**
+     * Encrypt Using Public Key
+     * @param data
+     * @param publicKey
+     * @return
+     * @throws Exception
+     */
+    public static String encrypt(String data, PublicKey publicKey) throws Exception {
+        Cipher cipher = Cipher.getInstance("RSA");
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+        byte[] encryptedData =  cipher.doFinal(data.getBytes());
+        return Base64.getEncoder().encodeToString(encryptedData);
+    }
+
+    /**
      * Decrypt Data using AES/CBC/PKCS5PADDING with SHA-512
      * @param _data
      * @return
@@ -264,6 +278,20 @@ public class SecureData {
     }
 
     /**
+     * Decrypt Using Private Key
+     * @param data
+     * @param privateKey
+     * @return
+     * @throws Exception
+     */
+    public static String decrypt(String data, PrivateKey privateKey) throws Exception {
+        Cipher cipher = Cipher.getInstance("RSA");
+        cipher.init(Cipher.DECRYPT_MODE, privateKey);
+        byte[] de = Base64.getDecoder().decode(data);
+        return  new String(cipher.doFinal(de));
+    }
+
+    /**
      * ONLY FOR TESTING PURPOSE
      * Code to Encrypt and Decrypt the Data
      * @param args
@@ -271,6 +299,73 @@ public class SecureData {
     public static void main(String[] args) throws Exception{
         System.out.println("----------------------------------------------------------------------------------------");
 
+        // Public Private Key Testing
+        doPublicPrivateKeyTesting();
+
+        // Secret Key Testing
+        // doSecretKeyTesting();
+    }
+
+    public static void doPublicPrivateKeyTesting() throws Exception {
+        System.out.println("Generate Public / Private Key Pairs.... ");
+
+        String publicKeyFileName    = "publicKey-Data.pem";
+        String privateKeyFileName   = "privateKey-Data.pem";
+        CryptoKeyGenerator cryptoKeys = new CryptoKeyGenerator()
+                .setKeyFiles(publicKeyFileName, privateKeyFileName)
+                .iFPublicPrivateKeyFileNotFound().THEN()
+                .createRSAKeyFiles()
+                .ELSE()
+                .readRSAKeyFiles()
+                .build();
+
+        // Extract the Keys
+        PublicKey publicKey = cryptoKeys.getPublicKey();
+        PrivateKey privateKey = cryptoKeys.getPrivateKey();
+
+        String data = "Hello to the World of Public Key Private key Encryption and Decryption";
+        System.out.println("Plain Data...  >>  "+data);
+
+        String encryptedData = SecureData.encrypt(data,  publicKey);
+        System.out.println("Encrypted Data >>  "+encryptedData);
+
+        String decryptedData = SecureData.decrypt(encryptedData,  privateKey);
+        System.out.println("Decrypted Data >>  "+decryptedData);
+
+    }
+
+    public static void doPublicPrivateKeyTesting2() throws Exception {
+        System.out.println("Generate Public / Private Key Pairs.... ");
+
+        KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+        keyGen.initialize(2048);
+
+        // Generate the key pair
+        KeyPair keyPair = keyGen.genKeyPair();
+
+        // Extract the Keys
+        PublicKey publicKey = keyPair.getPublic();
+        PrivateKey privateKey = keyPair.getPrivate();
+
+        // String data = "Hello to the World of Public and Private Keys....";
+        String data = "Hello to the World of Public Key Private key Encryption and Decryption";
+
+        System.out.println("Plain Data...  >>  "+data);
+
+        Cipher cipher = Cipher.getInstance("RSA");
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+        byte[] encryptedData =  cipher.doFinal(data.getBytes());
+        String ed = Base64.getEncoder().encodeToString(encryptedData);
+        System.out.println("Encrypted Data >>  "+ed);
+
+        cipher = Cipher.getInstance("RSA");
+        cipher.init(Cipher.DECRYPT_MODE, privateKey);
+        byte[] de = Base64.getDecoder().decode(ed);
+        String decryptedData = new String(cipher.doFinal(de));
+        System.out.println("Decrypted Data >>  "+decryptedData);
+    }
+
+    public static void doSecretKeyTesting() {
         testEncryptAESWithMD();
         testEncryptAES();
         testEncryptAES2();
