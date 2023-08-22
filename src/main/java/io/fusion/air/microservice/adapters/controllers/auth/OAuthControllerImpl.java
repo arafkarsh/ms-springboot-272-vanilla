@@ -80,6 +80,9 @@ public class OAuthControllerImpl extends AbstractController {
 	private AuthKeyCloakService keyCloakService;
 
 	@Autowired
+	private AuthLocalService authLocalService;
+
+	@Autowired
 	private TokenManager tokenManager;
 
 	@Operation(summary = "Authenticate User Locally")
