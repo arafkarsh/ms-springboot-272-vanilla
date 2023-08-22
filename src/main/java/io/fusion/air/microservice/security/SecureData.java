@@ -312,12 +312,12 @@ public class SecureData {
         String publicKeyFileName    = "publicKey-Data.pem";
         String privateKeyFileName   = "privateKey-Data.pem";
         CryptoKeyGenerator cryptoKeys = new CryptoKeyGenerator()
-                .setKeyFiles(publicKeyFileName, privateKeyFileName)
-                .iFPublicPrivateKeyFileNotFound().THEN()
+            .setKeyFiles(publicKeyFileName, privateKeyFileName)
+            .iFPublicPrivateKeyFileNotFound().THEN()
                 .createRSAKeyFiles()
-                .ELSE()
+            .ELSE()
                 .readRSAKeyFiles()
-                .build();
+            .build();
 
         // Extract the Keys
         PublicKey publicKey = cryptoKeys.getPublicKey();
