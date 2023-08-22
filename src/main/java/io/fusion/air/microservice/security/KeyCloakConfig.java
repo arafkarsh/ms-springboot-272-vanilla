@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.fusion.air.microservice.server.config;
+package io.fusion.air.microservice.security;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -60,7 +60,7 @@ public class KeyCloakConfig implements Serializable {
     private String keyCloakPublicKey;
 
     @Value("${server.keycloak.issuer}")
-    private String keyCloakIssuer;
+    private String tokenIssuer;
 
     public KeyCloakConfig() {
     }
@@ -93,7 +93,7 @@ public class KeyCloakConfig implements Serializable {
         return keyCloakPublicKey;
     }
 
-    public String getKeyCloakIssuer() {
-        return keyCloakIssuer;
+    public String getTokenIssuer() {
+        return tokenIssuer;
     }
 }

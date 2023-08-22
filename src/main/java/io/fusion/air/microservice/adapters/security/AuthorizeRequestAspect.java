@@ -16,8 +16,7 @@
 package io.fusion.air.microservice.adapters.security;
 
 import io.fusion.air.microservice.domain.exceptions.*;
-import io.fusion.air.microservice.security.JsonWebToken;
-import io.fusion.air.microservice.server.config.KeyCloakConfig;
+import io.fusion.air.microservice.security.*;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -33,6 +32,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.annotation.RequestScope;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -46,8 +46,9 @@ import static org.slf4j.LoggerFactory.getLogger;
  * @version:
  * @date:
  */
-@Component
 @Aspect
+@Component
+@RequestScope
 public class AuthorizeRequestAspect {
 
     // Set Logger -> Lookup will automatically determine the class name.
@@ -79,6 +80,12 @@ public class AuthorizeRequestAspect {
 
     @Autowired
     private ClaimsManager claimsManager;
+
+    @Autowired
+    private JsonWebTokenValidator jwtValidator;
+
+    @Autowired
+    private TokenDataFactory tokenDataFactory;
 
     /**
      * Validate REST Endpoint Annotated with @validateRefreshToken Annotation
@@ -227,7 +234,8 @@ public class AuthorizeRequestAspect {
         String user = null;
         String msg = null;
         try {
-            user = jwtUtil.getSubjectFromToken(token);
+            // user = jwtUtil.getSubjectFromToken(token);
+            user = jwtValidator.getSubjectFromToken(tokenDataFactory.createTokenData(token));
             // Store the user info for logging
             MDC.put("user", user);
             return user;
@@ -272,11 +280,15 @@ public class AuthorizeRequestAspect {
         UserDetails userDetails = userDetailsService.loadUserByUsername(user);
         String msg = null;
         try {
+            TokenData tokenData = tokenDataFactory.createTokenData(token);
             // Validate the Token
-            if (jwtUtil.validateToken(userDetails.getUsername(), token)) {
-                String role = jwtUtil.getUserRoleFromToken(token);
+            if(jwtValidator.validateToken(userDetails.getUsername(), tokenData)) {
+            // if (jwtUtil.validateToken(userDetails.getUsername(), token)) {
+               //  String role = jwtUtil.getUserRoleFromToken(token);
+                String role = jwtValidator.getUserRoleFromToken(tokenData);
                 // Set the Claims ONLY If it's a Single Token
-                Claims claims = jwtUtil.getAllClaims(token);
+                // Claims claims = jwtUtil.getAllClaims(token);
+                Claims claims = jwtValidator.getAllClaims(tokenData);
                 if(singleToken) {
                     claimsManager.setClaims(claims);
                     claimsManager.isClaimsInitialized();
@@ -343,7 +355,7 @@ public class AuthorizeRequestAspect {
             String tokenType = null;
             try {
                 tokenType = (String) claims.get("type");
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
             // Check the Token Type Only for Non KeyCloak Tokens
             if(!keyCloakConfig.isKeyCloakEnabled()) {
@@ -392,10 +404,14 @@ public class AuthorizeRequestAspect {
      * @param joinPoint
      */
     private void validateAndSetClaimsFromTxToken(long startTime, String user, String tokenKey,
-                                                 String tokenData, ProceedingJoinPoint joinPoint) {
+                                                 String tokenString, ProceedingJoinPoint joinPoint) {
         String token = null;
-        if (tokenData != null && tokenData.startsWith("Bearer ")) {
-            token = tokenData.substring(7);
+        if (tokenString != null && tokenString.startsWith("Bearer ")) {
+            // Extract the Token from the Header with the Prefix of the Bearer
+            token = tokenString.substring(7);
+        } else if (tokenString != null) {
+            // Extract the Token from the Header without the Prefix of the Bearer
+            token = tokenString;
         } else {
             String msg = "TX-Token: Access Denied: Unable to extract TX-Token from Header! "+user;
             logTime(startTime, "ERROR", msg, joinPoint);
@@ -404,13 +420,17 @@ public class AuthorizeRequestAspect {
         String msg = null;
         try {
             Claims claims = null;
-            if (jwtUtil.validateToken(user, token)) {
-                claims = jwtUtil.getAllClaims(token);
+            TokenData tokenData = tokenDataFactory.createLocalTokenData(token);
+            // Validate the Token
+            if(jwtValidator.validateToken(user, tokenData)) {
+            // if (jwtUtil.validateToken(user, token)) {
+
+                // claims = jwtUtil.getAllClaims(token);
+                claims = jwtValidator.getAllClaims(tokenData);
                 String tokenType = null;
                 try {
                     tokenType = (String) claims.get("type");
-                } catch (Exception e) {
-                }
+                } catch (Exception ignored) {}
                 if (tokenType == null) {
                     msg = "Invalid Token Type from Claims! " + user;
                     throw new AuthorizationException(msg);
@@ -423,7 +443,7 @@ public class AuthorizeRequestAspect {
                 claimsManager.isClaimsInitialized();
                 logTime(startTime, "SUCCESS", "TX-Token: User TX Authorized for the request",  joinPoint);
             }  else {
-                msg = "TX-Token: Unauthorized Access: Token Validation Failed!";
+                msg = "TX-Token: Unauthorized Access: Token Validation FAILED!";
                 throw new AuthorizationException(msg);
             }
         } catch(AuthorizationException e) {

@@ -48,9 +48,6 @@ public class TokenManager {
     private ServiceConfiguration serviceConfig;
 
     @Autowired
-    private ClaimsManager claimsManager;
-
-    @Autowired
     private HeaderManager headerManager;
 
     @Value("${server.token.auth.expiry:300000}")
@@ -69,14 +66,6 @@ public class TokenManager {
         this.serviceConfig = _serviceConfig;
         tokenAuthExpiry = tknExpiry;
         tokenRefreshExpiry = tknRefreshExpiry;
-    }
-
-    /**
-     * Returns Claims
-     * @return
-     */
-    public ClaimsManager getClaims() {
-        return claimsManager;
     }
 
     /**
@@ -122,7 +111,7 @@ public class TokenManager {
 
         if(headers != null) {
             // headers.add("TX-TOKEN", "Bearer " + token);
-            headerManager.setResponseHeader(AuthorizeRequestAspect.TX_TOKEN, "Bearer " + token);
+            headerManager.setResponseHeader(AuthorizeRequestAspect.TX_TOKEN, token);
         }
         return token;
     }
@@ -144,7 +133,7 @@ public class TokenManager {
         long txTokenExpiry =  JsonWebToken.EXPIRE_IN_ONE_DAY;
         String token = new JsonWebToken()
                             .init(serviceConfig.getTokenType())
-                            .setIssuer(serviceConfig.getServiceOrg())
+                            // .setIssuer(serviceConfig.getServiceOrg())
                             .generateToken( subject,  serviceConfig.getServiceOrg(),  txTokenExpiry,  claims);
 
         // Store Tokens
@@ -176,14 +165,14 @@ public class TokenManager {
         long txTokenExpiry =  JsonWebToken.EXPIRE_IN_ONE_DAY;
         String token = new JsonWebToken()
                             .init(serviceConfig.getTokenType())
-                            .setIssuer(serviceConfig.getServiceOrg())
+                            // .setIssuer(serviceConfig.getServiceOrg())
                             .generateToken( subject,  serviceConfig.getServiceOrg(),  txTokenExpiry,  claims);
 
         // TX-Token
         claims.put("type",TX_USERS);
         String txToken = new JsonWebToken()
                             .init(serviceConfig.getTokenType())
-                            .setIssuer(serviceConfig.getServiceOrg())
+                            // .setIssuer(serviceConfig.getServiceOrg())
                             .generateToken( subject,  serviceConfig.getServiceOrg(),  txTokenExpiry,  claims);
 
         // Store Tokens
@@ -195,7 +184,7 @@ public class TokenManager {
         if(headers != null) {
             // headers.add("Authorization", "Bearer " + token);
             headerManager.setResponseHeader("Authorization", "Bearer " + token);
-            headerManager.setResponseHeader("TX-TOKEN", "Bearer " + txToken);
+            headerManager.setResponseHeader("TX-TOKEN", txToken);
         }
         // Return Auth & TX Tokens
         return tokens;
@@ -252,11 +241,11 @@ public class TokenManager {
 
 
         HashMap<String, String> tokens = refreshTokens(subject, authClaims, refreshClaims);
-        String authToken = tokens.get("token");
-        String refreshTkn = tokens.get("refresh");
+        String authToken = tokens.get("Authorization");
+        String refreshTkn = tokens.get("Refresh-Token");
         if(headers != null) {
             headerManager.setResponseHeader(AuthorizeRequestAspect.AUTH_TOKEN, "Bearer " + authToken);
-            headerManager.setResponseHeader(AuthorizeRequestAspect.REFRESH_TOKEN, "Bearer " + refreshTkn);
+            headerManager.setResponseHeader(AuthorizeRequestAspect.REFRESH_TOKEN, refreshTkn);
         }
         return tokens;
     }

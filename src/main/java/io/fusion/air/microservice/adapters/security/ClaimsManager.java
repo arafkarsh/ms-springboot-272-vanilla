@@ -43,7 +43,7 @@ public class ClaimsManager {
     public void setClaims(Claims _claims) {
         claims = _claims;
         claimsInitialized = true;
-        System.out.println(">>> CLAIMS = "+ Utils.toJsonString(claims));
+        // System.out.println(">>> CLAIMS = "+ Utils.toJsonString(claims));
     }
 
     /**
@@ -102,4 +102,33 @@ public class ClaimsManager {
     public String getUserRole() {
         return (claims != null) ? (String) claims.get("rol") : "";
     }
+
+    // ====================================================================================================
+    // Claims from KeyCloak Authentication
+    // ====================================================================================================
+
+    /**
+     * Returns the User ID
+     * @return
+     */
+    public String getUserID() {
+        return (claims != null) ? (String) claims.get("preferred_username") : "";
+    }
+
+    /**
+     * Returns the User Name
+     * @return
+     */
+    public String getUserName() {
+        return (claims != null) ? (String) claims.get("name") : "";
+    }
+
+    /**
+     * Returns the Email Address
+     * @return
+     */
+    public String getEmail() {
+        return (claims != null) ? (String) claims.get("email") : "";
+    }
+
 }

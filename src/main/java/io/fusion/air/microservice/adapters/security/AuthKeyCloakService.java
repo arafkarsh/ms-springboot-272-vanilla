@@ -18,10 +18,9 @@ package io.fusion.air.microservice.adapters.security;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.fusion.air.microservice.domain.exceptions.AuthorizationException;
-import io.fusion.air.microservice.domain.exceptions.SecurityException;
 import io.fusion.air.microservice.domain.models.auth.Token;
 import io.fusion.air.microservice.security.CryptoKeyGenerator;
-import io.fusion.air.microservice.server.config.KeyCloakConfig;
+import io.fusion.air.microservice.security.KeyCloakConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -51,7 +50,7 @@ import java.util.Base64;
  * @date:
  */
 @Service
-public class KeyCloakService {
+public class AuthKeyCloakService {
 
     @Autowired
     private KeyCloakConfig keyCloakConfig;

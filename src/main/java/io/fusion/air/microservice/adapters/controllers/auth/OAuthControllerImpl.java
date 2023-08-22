@@ -16,10 +16,8 @@
 package io.fusion.air.microservice.adapters.controllers.auth;
 // Custom
 import com.fasterxml.jackson.databind.JsonNode;
-import io.fusion.air.microservice.adapters.security.AuthorizationRequired;
-import io.fusion.air.microservice.adapters.security.KeyCloakService;
-import io.fusion.air.microservice.adapters.security.SingleTokenAuthorizationRequired;
-import io.fusion.air.microservice.adapters.security.TokenManager;
+import io.fusion.air.microservice.adapters.security.*;
+import io.fusion.air.microservice.domain.exceptions.DataNotFoundException;
 import io.fusion.air.microservice.domain.exceptions.SecurityException;
 import io.fusion.air.microservice.domain.models.auth.Token;
 import io.fusion.air.microservice.domain.models.auth.UserCredentials;
@@ -44,7 +42,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.RequestScope;
 // Java
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 // SLF4J
@@ -70,7 +67,7 @@ import static org.slf4j.LoggerFactory.getLogger;
 // "/ms-cache/api/v1"
 @RequestMapping("${service.api.path}/auth")
 @RequestScope
-@Tag(name = "Authentication", description = "KeyCloak, OAuth2 Security Authentication, JWT Access, Refresh & Tx Tokens")
+@Tag(name = "Authentication", description = "KeyCloak, OAuth2 Security Authentication, JWT Access, Refresh & Tx Tokens, Remember Me Functionality")
 public class OAuthControllerImpl extends AbstractController {
 
 	// Set Logger -> Lookup will automatically determine the class name.
@@ -80,16 +77,49 @@ public class OAuthControllerImpl extends AbstractController {
 	private ServiceConfiguration serviceConfig;
 
 	@Autowired
-	private KeyCloakService keyCloakService;
+	private AuthKeyCloakService keyCloakService;
 
 	@Autowired
 	private TokenManager tokenManager;
 
+	@Operation(summary = "Authenticate User Locally")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					description = "User Authenticated Successfully",
+					content = {@Content(mediaType = "application/json")}),
+			@ApiResponse(responseCode = "404",
+					description = "Unable to Authenticate User",
+					content = @Content)
+	})
+	@PostMapping("/login")
+	public ResponseEntity<StandardResponse> authenticateUser(@Valid @RequestBody UserCredentials _user) {
+		log.info("|"+name()+"|Request to Authenticate User Locally "+_user.getUserId());
+
+		// Validate the User ID & Password with DB
+		// .....
+		// If Validation is Successful then Create the Tokens (Auth & Refresh Tokens)
+		HttpHeaders headers = new HttpHeaders();
+		HashMap<String, String> tokens = tokenManager.createAuthorizationToken(_user.getUserId(), headers);
+		// TX - Token
+		String txToken = tokenManager.createTXToken(_user.getUserId());
+		tokens.put("TX-Token", txToken);
+		headers.add("TX-Token", txToken);
+
+		StandardResponse stdResponse = createSuccessResponse("User Authenticated (Locally) Successfully");
+		stdResponse.setPayload(tokens);
+
+		// Store the Token in Cookies (Encrypted) for "Remember Me" functionality
+		Utils.createSecureCookieHeaders(headers, "RSH", SecureData.encrypt(tokens.get("Refresh-Token")));
+		Utils.createSecureCookieHeaders(headers, "TSH", SecureData.encrypt(txToken));
+
+		// Return the response entity with the custom headers and body
+		return new ResponseEntity<StandardResponse>(stdResponse, headers, HttpStatus.OK);
+	}
 
 	/**
 	 * Authenticate User
 	 */
-	@Operation(summary = "Authenticate User")
+	@Operation(summary = "Authenticate User using KeyCloak")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200",
 					description = "User Authenticated Successfully",
@@ -99,8 +129,8 @@ public class OAuthControllerImpl extends AbstractController {
 					content = @Content)
 	})
 	@PostMapping("/keycloak/login")
-	public ResponseEntity<StandardResponse> authenticateUser(@Valid @RequestBody UserCredentials _user) {
-		log.debug("|"+name()+"|Request to Authenticate User "+_user.getUserId());
+	public ResponseEntity<StandardResponse> authenticateUserUsingKeyCloak(@Valid @RequestBody UserCredentials _user) {
+		log.info("|"+name()+"|Request to Authenticate User using KeyCloak"+_user.getUserId());
 		Token token = keyCloakService.authenticateUser(_user.getUserId(), _user.getPassword());
 		StandardResponse stdResponse = createSuccessResponse("User Authenticated Successfully");
 		stdResponse.setPayload(token);
@@ -127,22 +157,22 @@ public class OAuthControllerImpl extends AbstractController {
 	@Operation(summary = "Authenticate User - Remember Me")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200",
-					description = "User Authenticated Successfully",
+					description = "User Remembered Successfully",
 					content = {@Content(mediaType = "application/json")}),
 			@ApiResponse(responseCode = "404",
-					description = "Unable to Authenticate User",
+					description = "Unable to Remember User",
 					content = @Content)
 	})
 	@GetMapping("/keycloak/login/remember/me")
 	public ResponseEntity<StandardResponse> authenticateRememberMe(HttpServletRequest request) {
-		log.debug("|"+name()+"|Request to Authenticate User based on Reemember Me");
+		log.info("|"+name()+"|Request to Authenticate User based on Reemember Me");
 		StandardResponse stdResponse = createSuccessResponse("User Remembered Successfully");
 		try {
 			HashMap cookies = Utils.getCookieMap(request);
 			String refreshToken = (String) cookies.get("RSH");
 			String txToken = (String) cookies.get("TSH");
 
-			// Refresh The token
+			// Refresh The token using KeyCloak Service
 			Token token = keyCloakService.refreshToken(SecureData.decrypt(refreshToken));
 
 			// Add Tokens (from KeyCloak) to Headers
@@ -154,9 +184,47 @@ public class OAuthControllerImpl extends AbstractController {
 			// Return the response entity with the custom headers and body
 			return new ResponseEntity<StandardResponse>(stdResponse, headers, HttpStatus.OK);
 		} catch(ClassCastException e) {
-			throw new SecurityException("Invalid Cookie Data");
+			throw new SecurityException("Invalid Cookie Data!");
+		} catch(NullPointerException e) {
+			throw new DataNotFoundException("Cookie Not Found!");
 		} catch(Exception e) {
 			throw new SecurityException("Unable to Remember the User! Please Re-Login Again with credentials.");
+		}
+	}
+
+	@Operation(summary = "Refresh Token when Auth Token expires")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200",
+					description = "Token Refreshed Successfully",
+					content = {@Content(mediaType = "application/json")}),
+			@ApiResponse(responseCode = "404",
+					description = "Unable to Refresh Token",
+					content = @Content)
+	})
+	@GetMapping("/keycloak/refresh/token")
+	public ResponseEntity<StandardResponse> refreshToken(HttpServletRequest request) {
+		log.info("|"+name()+"|Request to Authenticate User based on Reemember Me");
+		StandardResponse stdResponse = createSuccessResponse("User Remembered Successfully");
+		try {
+			String refreshToken = request.getHeader("Refresh-Token");
+			// Refresh The token
+			Token token = keyCloakService.refreshToken(refreshToken);
+
+			// Add Tokens (from KeyCloak) to Headers
+			HttpHeaders headers = new HttpHeaders();
+			headers.add("Authorization", "Bearer "+token.getAccessToken());
+			headers.add("Refresh-Token", token.getRefreshToken());
+			// headers.add("TX-Token", SecureData.decrypt(txToken));
+
+			Utils.createSecureCookieHeaders(headers, "RSH", SecureData.encrypt(token.getRefreshToken()));
+			// Utils.createSecureCookieHeaders(headers, "TSH", SecureData.encrypt(txToken));
+
+			// Return the response entity with the custom headers and body
+			return new ResponseEntity<StandardResponse>(stdResponse, headers, HttpStatus.OK);
+		} catch(ClassCastException e) {
+			throw new SecurityException("Invalid Cookie Data");
+		} catch(Exception e) {
+			throw new SecurityException("Unable to Refresh Token! Please Re-Login Again with credentials.");
 		}
 	}
 
@@ -176,7 +244,7 @@ public class OAuthControllerImpl extends AbstractController {
 	})
 	@GetMapping("/keycloak/token/test")
 	public ResponseEntity<StandardResponse> testToken() {
-		log.debug("|"+name()+"|Request to Test the KeyCloak Token ");
+		log.info("|"+name()+"|Request to Test the KeyCloak Token ");
 		StandardResponse stdResponse = createSuccessResponse("Token Tested Successfully");
 		stdResponse.setPayload("Token Tested Successfully");
 		return ResponseEntity.ok(stdResponse);
@@ -197,7 +265,7 @@ public class OAuthControllerImpl extends AbstractController {
 	})
 	@PostMapping("/keycloak/logout")
 	public ResponseEntity<StandardResponse> logoutUser() {
-		log.debug("|"+name()+"|Request to Logout User ");
+		log.info("|"+name()+"|Request to Logout User ");
 		StandardResponse stdResponse = createSuccessResponse("User Logged Successfully");
 		return ResponseEntity.ok(stdResponse);
 	}
@@ -217,7 +285,7 @@ public class OAuthControllerImpl extends AbstractController {
 	})
 	@GetMapping("/keycloak/public/key")
 	public ResponseEntity<StandardResponse> getPublicKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-		log.debug("|"+name()+"|Request to Get the Public Key ");
+		log.info("|"+name()+"|Request to Get the Public Key ");
 		JsonNode publicKey = keyCloakService.getPublicKeyFromKeycloak();
 		StandardResponse stdResponse = createSuccessResponse("Retrieved Public Key Successfully");
 		stdResponse.setPayload(publicKey);
@@ -239,7 +307,7 @@ public class OAuthControllerImpl extends AbstractController {
 	})
 	@GetMapping("/keycloak/public/key/pem")
 	public ResponseEntity<StandardResponse> getPublicKeyPEM() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-		log.debug("|"+name()+"|Request to Get the Public Key ");
+		log.info("|"+name()+"|Request to Get the Public Key ");
 		String publicKey = keyCloakService.getPublicKeyPEMFormat();
 		StandardResponse stdResponse = createSuccessResponse("Retrieved Public Key Successfully");
 		stdResponse.setPayload(publicKey);

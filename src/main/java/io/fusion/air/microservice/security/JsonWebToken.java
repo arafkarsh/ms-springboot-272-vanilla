@@ -26,7 +26,6 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Function;
 
-import io.fusion.air.microservice.server.config.KeyCloakConfig;
 import io.fusion.air.microservice.server.config.ServiceConfiguration;
 import io.jsonwebtoken.*;
 
@@ -78,6 +77,9 @@ public final class JsonWebToken {
 	public static final int PUBLIC_KEY				= 2;
 	public static final int KEYCLOAK_PUBLIC_KEY		= 3;
 
+	public static final int LOCAL_KEY 				= 1;
+	public static final int KEYCLOAK_KEY 			= 2;
+
 	@Autowired
 	private ServiceConfiguration serviceConfig;
 
@@ -91,6 +93,7 @@ public final class JsonWebToken {
 
 	private Key signingKey;
 	private Key validatorKey;
+	private Key validatorLocalKey;
 
 	private SignatureAlgorithm algorithm;
 	public final static SignatureAlgorithm defaultAlgo = SignatureAlgorithm.HS512;
@@ -146,6 +149,7 @@ public final class JsonWebToken {
 			case SECRET_KEY:
 				signingKey = new SecretKeySpec(getTokenKeyBytes(), algorithm.getJcaName());
 				validatorKey = signingKey;
+				validatorLocalKey = signingKey;
 				break;
 			case PUBLIC_KEY:
 				getCryptoKeyGenerator()
@@ -157,6 +161,7 @@ public final class JsonWebToken {
 				.build();
 				signingKey = getCryptoKeyGenerator().getPrivateKey();
 				validatorKey = getCryptoKeyGenerator().getPublicKey();
+				validatorLocalKey = getCryptoKeyGenerator().getPublicKey();
 				System.out.println("Public key format: " + getCryptoKeyGenerator().getPublicKey().getFormat());
 				System.out.println(getCryptoKeyGenerator().getPublicKeyPEMFormat());
 				break;
@@ -164,7 +169,9 @@ public final class JsonWebToken {
 	}
 
 	/**
-	 * Set the Validator Key as KeyCloak Public Key
+	 * This is set when the Applications Boots Up from the Servlet Event Listener
+	 * Servlet Event Listener ensures that the public key is downloaded from the KeyCloak Server
+	 * Set the Validator Key as KeyCloak Public Key if the Public Key downloaded from KeyCloak.
 	 */
 	public void setKeyCloakPublicKey() {
 		if(keycloakConfig.isKeyCloakEnabled()) {
@@ -178,9 +185,9 @@ public final class JsonWebToken {
 							getCryptoKeyGenerator()
 							.readPublicKey(new File(keycloakConfig.getKeyCloakPublicKey()))
 						);
-					issuer = keycloakConfig.getKeyCloakIssuer();
+					issuer = keycloakConfig.getTokenIssuer();
 					validatorKey = getCryptoKeyGenerator().getPublicKey();
-					String pem = getCryptoKeyGenerator().convertKeyToText(validatorKey, keyName);
+					String pem = getCryptoKeyGenerator().convertKeyToText(getValidatorKey(), keyName);
 
 					System.out.println("KeyCloak Public Key Set. Issuer = "+issuer);
 					System.out.println(pem);
@@ -327,11 +334,11 @@ public final class JsonWebToken {
 	 * @return
 	 */
 	public HashMap<String,String>  generateTokens(String subject, Map<String,Object> claimsToken, Map<String,Object> claimsRefreshToken) {
-		HashMap<String, String> tokens  = new HashMap<String, String>();
+		HashMap<String, String> tokens  = new LinkedHashMap<String, String>();
 		String tokenAuth 	= generateToken(subject, issuer, tokenAuthExpiry, claimsToken);
 		String tokenRefresh = generateToken(subject, issuer, tokenRefreshExpiry, claimsRefreshToken);
-		tokens.put("token", tokenAuth);
-		tokens.put("refresh", tokenRefresh);
+		tokens.put("Authorization", tokenAuth);
+		tokens.put("Refresh-Token", tokenRefresh);
 		return tokens;
 	}
 
@@ -354,11 +361,11 @@ public final class JsonWebToken {
 												  Map<String,Object> claimsToken, Map<String,Object> claimsRefreshToken) {
 		claimsToken = addDefaultClaims(claimsToken);
 		claimsRefreshToken = addDefaultClaims(claimsRefreshToken);
-		HashMap<String, String> tokens  = new HashMap<String, String>();
+		HashMap<String, String> tokens  = new LinkedHashMap<String, String>();
 		String tokenAuth 	= generateToken(subject, issuer, tokenAuthExpiry, claimsToken);
 		String tokenRefresh = generateToken(subject, issuer, tokenRefreshExpiry, claimsRefreshToken);
-		tokens.put("token", tokenAuth);
-		tokens.put("refresh", tokenRefresh);
+		tokens.put("Authorization", tokenAuth);
+		tokens.put("Refresh-Token", tokenRefresh);
 		return tokens;
 	}
 
@@ -377,6 +384,15 @@ public final class JsonWebToken {
 	 */
 	public Key getKey() {
 		return signingKey;
+	}
+
+
+	public Key getValidatorKey() {
+		return validatorKey;
+	}
+
+	public Key getValidatorLocalKey() {
+		return validatorLocalKey;
 	}
 
     /**
@@ -556,16 +572,19 @@ public final class JsonWebToken {
      * @return
      */
     public Claims getAllClaims(String _token) {
-    	/**
-		return Jwts.parserBuilder()
-				.setSigningKey(validatorKey)
-				.requireIssuer(issuer)
-				.build()
-				.parseClaimsJws(_token)
-				.getBody();
-		 */
     	return (Claims) getJws(_token).getBody();
     }
+
+	/**
+	 *
+	 * @param _token
+	 * @param issuer
+	 * @param keyType
+	 * @return
+	 */
+	public Claims getAllClaims(String _token, String issuer, int keyType) {
+		return (Claims) getJws(_token, issuer, keyType).getBody();
+	}
 
 	/**
 	 * Returns Jws
@@ -574,7 +593,23 @@ public final class JsonWebToken {
 	 */
 	public Jws getJws(String _token) {
 		return Jwts.parserBuilder()
-				.setSigningKey(validatorKey)
+				.setSigningKey(getValidatorKey())
+				.requireIssuer(issuer)
+				.build()
+				.parseClaimsJws(_token);
+	}
+
+	/**
+	 * Returns Jws
+	 * @param _token
+	 * @param issuer
+	 * @param keyType
+	 * @return
+	 */
+	public Jws getJws(String _token, String issuer, int keyType) {
+		Key key = (keyType == LOCAL_KEY) ? getValidatorLocalKey() : getValidatorKey();
+		return Jwts.parserBuilder()
+				.setSigningKey(key)
 				.requireIssuer(issuer)
 				.build()
 				.parseClaimsJws(_token);
@@ -742,6 +777,7 @@ public final class JsonWebToken {
 		jsonWebToken.tokenStats(refresh, false, false);
 
 	}
+
 
 	/**
 	 protected static void test() {

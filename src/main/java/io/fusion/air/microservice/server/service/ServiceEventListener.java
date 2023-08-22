@@ -86,6 +86,7 @@ public class ServiceEventListener {
 			log.debug("Generate Test Tokens = {} ", serverTokenTest);
 			generateTestToken();
 		}
+		// Initialize the KeyCloak Public Key
 		jsonWebToken.setKeyCloakPublicKey();
 	}
 
@@ -116,8 +117,8 @@ public class ServiceEventListener {
 		// Step 4: Generate Authorize Tokens
 		HashMap<String, String> tokens = tokenManager.createAuthorizationToken(subject, null);
 
-		String token = tokens.get("token");
-		String refresh = tokens.get("refresh");
+		String token = tokens.get("Authorization");
+		String refresh = tokens.get("Refresh-Token");
 		log.debug("\nToken Expiry in Days:Hours:Mins  {} ", JsonWebToken.printExpiryTime(tokenAuthExpiry));
 		jsonWebToken.tokenStats(token, false, false);
 
