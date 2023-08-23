@@ -155,26 +155,22 @@ public final class HashData {
 
     public final static String createHash(final String _message, final String _algo, final String _encoding) throws Exception {
 
-        if(_message == null) {							// Check Input Message
+        if(_message == null) {							                    // Check Input Message
             throw new Exception("Invalid message for hashing");
         }
-
         String encoding = _encoding;
-        if(encoding == null) {								// Check Input Encoding
+        if(encoding == null) {								                // Check Input Encoding
             encoding = "UTF-8";
         }
-
         // Input validation over -------------------------------------------------------------------------------
         MessageDigest mesgDigest = null;
         try {
-            mesgDigest = MessageDigest.getInstance(_algo); 	// Load the Algorithm
+            mesgDigest = MessageDigest.getInstance(_algo); 	                // Load the Algorithm
         } catch(NoSuchAlgorithmException e) { throw e; }
         try {
             mesgDigest.update(_message.getBytes(encoding)); 				// Updates the digest
         } catch(UnsupportedEncodingException e) { throw e; }
-
         byte raw[] = mesgDigest.digest(); 									// Hash Computation and reset
-
         return base64Encoder(raw); 											// Convert raw data in Base64
 
         // Hash computing over -------------------------------------------------------------------------------
