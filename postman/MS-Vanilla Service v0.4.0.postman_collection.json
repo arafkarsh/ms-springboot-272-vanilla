@@ -10773,6 +10773,77 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "http://localhost:9089/ms-vanilla/api/v1/auth/login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"Authorization\", pm.response.headers.get('Authorization'));",
+							"pm.environment.set(\"Refresh-Token\", pm.response.headers.get('Refresh-Token'));",
+							"pm.environment.set(\"TX-Token\", pm.response.headers.get('TX-Token'));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"userId\": \"john.doe\",\n  \"password\": \"2023.Doe\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:9089/ms-vanilla/api/v1/auth/login",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9089",
+					"path": [
+						"ms-vanilla",
+						"api",
+						"v1",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:9089/ms-vanilla/api/v1/auth/keycloak/login/remember/me",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9089/ms-vanilla/api/v1/auth/keycloak/login/remember/me",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9089",
+					"path": [
+						"ms-vanilla",
+						"api",
+						"v1",
+						"auth",
+						"keycloak",
+						"login",
+						"remember",
+						"me"
+					]
+				}
+			},
+			"response": []
 		}
 	],
 	"variable": [

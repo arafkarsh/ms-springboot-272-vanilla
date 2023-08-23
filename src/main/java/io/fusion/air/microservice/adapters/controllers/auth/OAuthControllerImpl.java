@@ -184,6 +184,11 @@ public class OAuthControllerImpl extends AbstractController {
 			headers.add("Refresh-Token", token.getRefreshToken());
 			headers.add("TX-Token", SecureData.decrypt(txToken));
 
+			// Store the Token in Cookies (Encrypted) for "Remember Me" functionality
+			// Utils.createSecureCookieHeaders(headers, "ABC", SecureData.encrypt(token.getAccessToken()));
+			Utils.createSecureCookieHeaders(headers, "RSH", SecureData.encrypt(token.getRefreshToken()));
+			Utils.createSecureCookieHeaders(headers, "TSH", SecureData.encrypt(txToken));
+
 			// Return the response entity with the custom headers and body
 			return new ResponseEntity<StandardResponse>(stdResponse, headers, HttpStatus.OK);
 		} catch(ClassCastException e) {
