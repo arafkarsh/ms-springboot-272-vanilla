@@ -246,8 +246,8 @@ public final class HashData {
 
         // Print all the algorithms computed hash value of the input message if the algo code == ZERO
         for(int x = 0; x< (Algorithms.ALGOS.length-1); x++) {
-            passwordHash = HashData.createHash(password, Algorithms.ALGOS[x+1]);
-            System.out.println(Algorithms.ALGOS[x+1]+"\tPassword = ( "+password+" )"+" { "+passwordHash+" }");
+            passwordHash = HashData.createHash(password, Algorithms.ALGOS[x]);
+            System.out.println(Algorithms.ALGOS[x]+"\tPassword = ( "+password+" )"+" { "+passwordHash+" }");
         }
     }
 
