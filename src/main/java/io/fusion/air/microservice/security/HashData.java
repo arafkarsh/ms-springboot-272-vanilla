@@ -245,9 +245,14 @@ public final class HashData {
         String password 	= args[0];
 
         // Print all the algorithms computed hash value of the input message if the algo code == ZERO
-        for(int x = 0; x< (Algorithms.ALGOS.length-1); x++) {
+        for(int x = 0; x< Algorithms.ALGOS.length; x++) {
             passwordHash = HashData.createHash(password, Algorithms.ALGOS[x]);
             System.out.println(Algorithms.ALGOS[x]+"\tPassword = ( "+password+" )"+" { "+passwordHash+" }");
+        }
+        System.out.println("-----------------------------------------------\n");
+        for(int x = 0; x< Algorithms.ALGOS.length; x++) {
+            passwordHash = HashData.createHash("Hello", Algorithms.ALGOS[x]);
+            System.out.println(Algorithms.ALGOS[x]+"\tPassword = ( Hello )"+" { "+passwordHash+" }");
         }
     }
 

@@ -303,7 +303,7 @@ public class SecureData {
         doPublicPrivateKeyTesting();
 
         // Secret Key Testing
-        doSecretKeyTesting();
+        // doSecretKeyTesting();
     }
 
     public static void doPublicPrivateKeyTesting() throws Exception {
