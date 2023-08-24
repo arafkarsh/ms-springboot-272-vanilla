@@ -91,13 +91,7 @@ public class DigitalSignature {
         System.out.println("Create the Signature = " + fileName + ".signature");
         Files.write(Paths.get(fileName + ".signature"), digitalSignature);
 
-        // Convert the digital signature to PEM format
-        String signaturePEM = "-----BEGIN SIGNATURE-----\n" +
-                Base64.getEncoder().encodeToString(digitalSignature) +
-                "\n-----END SIGNATURE-----";
-
         // Write the digital signature to a file in PEM format
-        // Files.write(Paths.get(fileName+".pem"), signaturePEM.getBytes());
         writePEMFile(digitalSignature, fileName+".pem", "SIGNATURE");
     }
 
