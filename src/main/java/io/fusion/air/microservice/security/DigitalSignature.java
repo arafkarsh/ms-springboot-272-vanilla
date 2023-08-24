@@ -15,9 +15,13 @@
  */
 package io.fusion.air.microservice.security;
 
+import org.bouncycastle.util.io.pem.PemObject;
+import org.bouncycastle.util.io.pem.PemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.*;
@@ -70,6 +74,8 @@ public class DigitalSignature {
      * @throws Exception
      */
     public void signDocument(String documentName)  throws Exception {
+
+        String fileName = documentName.split("\\.")[0];
         // Create a signature instance
         System.out.println("Creating Signature Instance for the Algo = SHA256withRSA");
         Signature signature = Signature.getInstance("SHA256withRSA");
@@ -82,8 +88,17 @@ public class DigitalSignature {
         byte[] digitalSignature = signature.sign();
 
         // Write the digital signature to a file
-        System.out.println("Create the Signature = " + documentName + ".signature");
-        Files.write(Paths.get(documentName + ".signature"), digitalSignature);
+        System.out.println("Create the Signature = " + fileName + ".signature");
+        Files.write(Paths.get(fileName + ".signature"), digitalSignature);
+
+        // Convert the digital signature to PEM format
+        String signaturePEM = "-----BEGIN SIGNATURE-----\n" +
+                Base64.getEncoder().encodeToString(digitalSignature) +
+                "\n-----END SIGNATURE-----";
+
+        // Write the digital signature to a file in PEM format
+        // Files.write(Paths.get(fileName+".pem"), signaturePEM.getBytes());
+        writePEMFile(digitalSignature, fileName+".pem", "SIGNATURE");
     }
 
     /**
@@ -92,8 +107,10 @@ public class DigitalSignature {
      * @throws Exception
      */
     public  void verifySignature(String documentName) throws Exception {
+        String fileName = documentName.split("\\.")[0];
+
         // Read the digital signature
-        byte[] digitalSignature = Files.readAllBytes(Paths.get(documentName + ".signature"));
+        byte[] digitalSignature = Files.readAllBytes(Paths.get(fileName + ".signature"));
 
         // Create a signature instance and initialize it with the public key
         Signature signature = Signature.getInstance("SHA256withRSA");
@@ -105,8 +122,33 @@ public class DigitalSignature {
 
         // Verify the signature
         boolean isValid = signature.verify(digitalSignature);
-        System.out.println("Create the Signature = " + documentName + ".signature");
+        System.out.println("Verify the Signature = " + fileName + ".signature");
         System.out.println("Signature Verified   = Status = [" + isValid + "] "+ documentName );
+    }
+
+    /**
+     * Write PEM File for the Signature
+     * @param _fileName
+     * @param _description
+     */
+    private void writePEMFile(byte[] _signature, String _fileName, String _description) {
+        if(_signature == null || _fileName == null) {
+            return;
+        }
+        PemObject pemObject = new PemObject(_description, _signature);
+        PemWriter pemWriter = null;
+        try {
+            pemWriter = new PemWriter(new OutputStreamWriter(new FileOutputStream(_fileName)));
+            pemWriter.writeObject(pemObject);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if(pemWriter != null) {
+                try {
+                    pemWriter.close();
+                } catch (Exception ignored) {}
+            }
+        }
     }
 
     /**
