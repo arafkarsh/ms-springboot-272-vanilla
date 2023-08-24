@@ -1,0 +1,126 @@
+/**
+ * (C) Copyright 2021 Araf Karsh Hamid
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package io.fusion.air.microservice.security;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.*;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
+
+/**
+ * @author: Araf Karsh Hamid
+ * @version:
+ * @date:
+ */
+
+@Service
+public class DigitalSignature {
+
+    private static final String path = "/Users/arafkarsh/ws/IntelliJ/book/ms-springboot-272-vanilla/";
+
+    @Autowired
+    private CryptoKeyGenerator cryptoKeyGenerator;
+
+    /**
+     * Generate the Public and Private Keys
+     * If the Key exists - Read the Keys from PEM File
+     */
+    public void generateAndLoadKeys() {
+        cryptoKeyGenerator = new CryptoKeyGenerator()
+            .setKeyFiles("publicKey-ds.pem", "privateKey-ds.pem")
+            .iFPublicPrivateKeyFileNotFound().THEN()
+                .createRSAKeyFiles()
+            .ELSE()
+                .readRSAKeyFiles()
+            .build();
+    }
+
+    /**
+     * Get Crypto Generator Instance, If not created then create one
+     * @return
+     */
+    public CryptoKeyGenerator getCrypto() {
+        if(cryptoKeyGenerator == null) {
+            generateAndLoadKeys();
+        }
+        return cryptoKeyGenerator;
+    }
+
+    /**
+     * Sign the Document
+     *
+     * @param documentName
+     * @throws Exception
+     */
+    public void signDocument(String documentName)  throws Exception {
+        // Create a signature instance
+        System.out.println("Creating Signature Instance for the Algo = SHA256withRSA");
+        Signature signature = Signature.getInstance("SHA256withRSA");
+        signature.initSign(getCrypto().getPrivateKey());
+
+        // Read and sign the document
+        System.out.println("Sign the Document    = " + documentName);
+        byte[] document = Files.readAllBytes(Paths.get( documentName));
+        signature.update(document);
+        byte[] digitalSignature = signature.sign();
+
+        // Write the digital signature to a file
+        System.out.println("Create the Signature = " + documentName + ".signature");
+        Files.write(Paths.get(documentName + ".signature"), digitalSignature);
+    }
+
+    /**
+     * Verify the Signature
+     * @param documentName
+     * @throws Exception
+     */
+    public  void verifySignature(String documentName) throws Exception {
+        // Read the digital signature
+        byte[] digitalSignature = Files.readAllBytes(Paths.get(documentName + ".signature"));
+
+        // Create a signature instance and initialize it with the public key
+        Signature signature = Signature.getInstance("SHA256withRSA");
+        signature.initVerify(getCrypto().getPublicKey());
+
+        // Read and update the document
+        byte[] document = Files.readAllBytes(Paths.get(documentName));
+        signature.update(document);
+
+        // Verify the signature
+        boolean isValid = signature.verify(digitalSignature);
+        System.out.println("Create the Signature = " + documentName + ".signature");
+        System.out.println("Signature Verified   = Status = [" + isValid + "] "+ documentName );
+    }
+
+    /**
+     * Testing the Digital Signature
+     * @param args
+     * @throws Exception
+     */
+    public static void main(String[] args) throws Exception {
+        DigitalSignature ds = new DigitalSignature();
+        System.out.println("SIGN THE DOCUMENT >------------------------------------------------------");
+        ds.signDocument(path + "x509.txt");
+
+        System.out.println("VERIFY DOCUMENT   >------------------------------------------------------");
+        ds.verifySignature(path + "x509.txt");
+    }
+
+}

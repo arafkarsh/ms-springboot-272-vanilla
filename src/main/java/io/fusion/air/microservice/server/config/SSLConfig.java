@@ -59,10 +59,11 @@ public class SSLConfig {
     private Connector redirectConnector() {
         Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
         connector.setScheme("http");
-        connector.setPort(serviceConfig.getServerPort());
+        connector.setPort(8080);
         connector.setSecure(false);
         connector.setRedirectPort(9443);
         return connector;
     }
     */
+
 }
