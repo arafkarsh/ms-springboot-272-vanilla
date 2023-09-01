@@ -1,3 +1,8 @@
+# =======================================================================
+# MS-Vanilla Service Properties
+# =======================================================================
+build.number=101
+build.date=Fri Sep 1 22:00:54 IST 2023
 # ------------------------------------------------------------------------
 # Spring Profile
 # ------------------------------------------------------------------------
@@ -61,7 +66,7 @@ server.keycloak.enabled=true
 # Host Details
 # ------------------------------------------------------------------------
 server.host=localhost
-server.host.dev=http://localhost:${server.port}
+server.host.dev=https://localhost:${server.port}
 server.host.dev.desc=Development Server
 server.host.uat=https://uat.${service.org}.com
 server.host.uat.desc=UAT Server

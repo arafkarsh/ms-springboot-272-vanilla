@@ -327,6 +327,11 @@ public class ServiceBootStrap {
 		Server dev = new Server();
 		dev.setUrl(serviceConfig.getServerHostDev());
 		dev.setDescription(serviceConfig.getServerHostDevDesc());
+
+		Server devTLS = new Server();
+		devTLS.setUrl(serviceConfig.getServerHostDev().replaceAll("http", "https"));
+		devTLS.setDescription(serviceConfig.getServerHostDevDesc() + " - TLS");
+
 		Server uat = new Server();
 		uat.setUrl(serviceConfig.getServerHostUat());
 		uat.setDescription(serviceConfig.getServerHostUatDesc());
@@ -335,6 +340,7 @@ public class ServiceBootStrap {
 		prod.setDescription(serviceConfig.getServerHostProdDesc());
 
 		serverList.add(dev);
+		serverList.add(devTLS);
 		serverList.add(uat);
 		serverList.add(prod);
 
