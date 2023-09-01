@@ -450,7 +450,7 @@ public class ProductControllerImpl extends AbstractController {
 	/**
 	 * Delete the Product
 	 */
-	@AuthorizationRequired(role = "User")
+	@AuthorizationRequired(role = "Admin")
 	@Operation(summary = "Delete Product", security = { @SecurityRequirement(name = "bearer-key") })
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200",

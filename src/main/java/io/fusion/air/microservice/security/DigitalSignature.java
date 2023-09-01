@@ -79,12 +79,15 @@ public class DigitalSignature {
         // Create a signature instance
         System.out.println("Creating Signature Instance for the Algo = SHA256withRSA");
         Signature signature = Signature.getInstance("SHA256withRSA");
+        // Initialize the Signature with Private Key Previously Generated
         signature.initSign(getCrypto().getPrivateKey());
 
         // Read and sign the document
         System.out.println("Sign the Document    = " + documentName);
         byte[] document = Files.readAllBytes(Paths.get( documentName));
+        // Set the Doc in the Signature
         signature.update(document);
+        // Sign the Document
         byte[] digitalSignature = signature.sign();
 
         // Write the digital signature to a file
@@ -103,11 +106,12 @@ public class DigitalSignature {
     public  void verifySignature(String documentName) throws Exception {
         String fileName = documentName.split("\\.")[0];
 
-        // Read the digital signature
+        // Read the digital signature - Reading Binary Version of the Signature
         byte[] digitalSignature = Files.readAllBytes(Paths.get(fileName + ".signature"));
 
         // Create a signature instance and initialize it with the public key
         Signature signature = Signature.getInstance("SHA256withRSA");
+        // Instantiate with the Public Key
         signature.initVerify(getCrypto().getPublicKey());
 
         // Read and update the document
