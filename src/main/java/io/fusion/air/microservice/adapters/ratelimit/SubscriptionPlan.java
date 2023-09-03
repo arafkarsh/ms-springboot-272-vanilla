@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.fusion.air.microservice.adapters.utils;
+package io.fusion.air.microservice.adapters.ratelimit;
 
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Refill;

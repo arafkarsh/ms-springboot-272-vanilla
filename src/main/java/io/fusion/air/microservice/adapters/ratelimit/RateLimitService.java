@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.fusion.air.microservice.adapters.utils;
+package io.fusion.air.microservice.adapters.ratelimit;
 
 import io.github.bucket4j.Bucket;
 import org.slf4j.Logger;
@@ -38,6 +38,8 @@ public class RateLimitService {
     // Set Logger -> Lookup will automatically determine the class name.
     private static final Logger log = getLogger(lookup().lookupClass());
     private final Bucket freemiumBucket;
+
+    public static final String LICENSE_KEY_HEADER = "X-LICENSE-KEY";
 
     private final Map<String, Bucket> cache = new ConcurrentHashMap<>();
 

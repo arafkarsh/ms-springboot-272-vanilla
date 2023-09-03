@@ -15,7 +15,7 @@
  */
 package io.fusion.air.microservice.adapters.controllers.ratelimit;
 // Custom
-import io.fusion.air.microservice.adapters.utils.RateLimitService;
+import io.fusion.air.microservice.adapters.ratelimit.RateLimitService;
 import io.fusion.air.microservice.domain.entities.order.CartEntity;
 import io.fusion.air.microservice.domain.exceptions.LimitExceededException;
 import io.fusion.air.microservice.domain.models.core.StandardResponse;
@@ -103,7 +103,7 @@ public class RateLimitControllerImpl extends AbstractController {
 		}
 	}
 
-	@Operation(summary = "Test the Rate Limit")
+	@Operation(summary = "Get the Carts for Customer with the Rate Limit")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200",
 					description = "Rate Limit Tested Successfully",
@@ -113,17 +113,15 @@ public class RateLimitControllerImpl extends AbstractController {
 					content = @Content)
 	})
 	@GetMapping("/customer/{customerId}")
-	public ResponseEntity<StandardResponse> rateLimitTest(@RequestHeader(value = "X-API-LICENSE") String apiLicense,
-															@PathVariable("customerId") String customerId) {
-		log.info("|"+name()+"|Request to Test the rate limit for Customer {} with License {}", customerId, apiLicense);
-		if(rateLimitService.tryConsume()) {
-			List<CartEntity> cart = cartService.findByCustomerId(customerId);
-			StandardResponse stdResponse = createSuccessResponse("Cart Retrieved. Items =  " + cart.size());
-			stdResponse.setPayload(cart);
-			return ResponseEntity.ok(stdResponse);
-		} else {
-			throw new LimitExceededException("For Fetch Carts By CustomerID!");
-		}
+	// public ResponseEntity<StandardResponse> rateLimitTest(@RequestHeader(value = "X-API-LICENSE") String apiLicense,
+	// 														 @PathVariable("customerId") String customerId) {
+	public ResponseEntity<StandardResponse> rateLimitTest(@PathVariable("customerId") String customerId) {
+
+		log.info("|"+name()+"|Request to Test the rate limit for Customer {}", customerId);
+		List<CartEntity> cart = cartService.findByCustomerId(customerId);
+		StandardResponse stdResponse = createSuccessResponse("Cart Retrieved. Items =  " + cart.size());
+		stdResponse.setPayload(cart);
+		return ResponseEntity.ok(stdResponse);
 	}
 
 	/**
@@ -133,7 +131,7 @@ public class RateLimitControllerImpl extends AbstractController {
 	 * @return
 	 * @throws Exception
 	 */
-	@Operation(summary = "Get The Cart For Items Price Greater Than")
+	@Operation(summary = "Get The Cart For Items Price Greater Than with Rate Limit")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200",
 					description = "Cart Retrieved!",
@@ -156,7 +154,7 @@ public class RateLimitControllerImpl extends AbstractController {
 	/**
 	 * De-Activate the Cart Item
 	 */
-	@Operation(summary = "De-Activate Cart Item")
+	@Operation(summary = "De-Activate Cart Item with Rate Limit")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200",
 					description = "Cart Item De-Activated",
@@ -179,7 +177,7 @@ public class RateLimitControllerImpl extends AbstractController {
 	/**
 	 * Delete the Cart Item
 	 */
-	@Operation(summary = "Delete Cart Item")
+	@Operation(summary = "Delete Cart Item with Rate Limit")
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200",
 					description = "Cart Item Deleted",
@@ -196,5 +194,4 @@ public class RateLimitControllerImpl extends AbstractController {
 		StandardResponse stdResponse = createSuccessResponse("Cart Item Deleted");
 		return ResponseEntity.ok(stdResponse);
 	}
-
  }

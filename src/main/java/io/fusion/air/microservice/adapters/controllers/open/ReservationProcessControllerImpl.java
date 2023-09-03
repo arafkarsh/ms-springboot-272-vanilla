@@ -32,7 +32,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.RequestScope;
-// Java / utils
+// Java / ratelimit
 import org.slf4j.Logger;
 import javax.validation.Valid;
 import java.util.List;
