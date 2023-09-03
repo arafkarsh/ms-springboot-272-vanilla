@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 package io.fusion.air.microservice.adapters.ratelimit;
-
+// Custom
+import io.fusion.air.microservice.server.config.CacheDefaultConfig;
+// Bucket4J
 import io.github.bucket4j.Bucket;
-import org.slf4j.Logger;
+// Spring Framework
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
+// SLF4J
+import org.slf4j.Logger;
 import static java.lang.invoke.MethodHandles.lookup;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -37,21 +40,19 @@ public class RateLimitService {
 
     // Set Logger -> Lookup will automatically determine the class name.
     private static final Logger log = getLogger(lookup().lookupClass());
-    private final Bucket freemiumBucket;
 
     public static final String LICENSE_KEY_HEADER = "X-LICENSE-KEY";
 
-    private final Map<String, Bucket> cache = new ConcurrentHashMap<>();
+    @Autowired
+    private CacheManager cacheManager;      // Autowire the Cache Manager
 
-    public RateLimitService() {
-        log.info("Initializing RateLimitService with Freemium Bucket for the Rate Limit");
-        this.freemiumBucket = getBucketForLicense("FREE000-000");
-    }
+
     /**
-     * Try to Consume the Bucket
+     * Try to Consume the Freemium Bucket
      * @return
      */
     public boolean tryConsume() {
+        Bucket freemiumBucket = getBucketForLicense("FREE000-000");
         return freemiumBucket.tryConsume(1);
     }
 
@@ -79,7 +80,8 @@ public class RateLimitService {
      * @return
      */
     public Bucket getBucketForLicense(String licenseKey) {
-        return cache.computeIfAbsent(licenseKey, this::createBucket);
+        Cache bucketCache = cacheManager.getCache(CacheDefaultConfig.RATE_LIMIT_CACHE);
+        return bucketCache.get(licenseKey, () -> createBucket(licenseKey));
     }
 
     /**
