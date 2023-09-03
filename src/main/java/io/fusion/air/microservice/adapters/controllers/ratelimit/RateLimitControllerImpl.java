@@ -15,7 +15,7 @@
  */
 package io.fusion.air.microservice.adapters.controllers.ratelimit;
 // Custom
-import io.fusion.air.microservice.adapters.service.RateLimitServiceImpl;
+import io.fusion.air.microservice.adapters.utils.RateLimitService;
 import io.fusion.air.microservice.domain.entities.order.CartEntity;
 import io.fusion.air.microservice.domain.exceptions.LimitExceededException;
 import io.fusion.air.microservice.domain.models.core.StandardResponse;
@@ -36,7 +36,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.annotation.RequestScope;
 // Java
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 // SLF4J
@@ -44,9 +43,7 @@ import static java.lang.invoke.MethodHandles.lookup;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.slf4j.Logger;
 // Bucket4J
-import io.github.bucket4j.Bandwidth;
-import io.github.bucket4j.Bucket;
-import io.github.bucket4j.Refill;
+
 
 /**
  * Cart Controller for the Service
@@ -76,7 +73,7 @@ public class RateLimitControllerImpl extends AbstractController {
 	private CartService cartService;
 
 	@Autowired
-	private RateLimitServiceImpl rateLimitService;
+	private RateLimitService rateLimitService;
 
 	/**
 	 * GET Method Call to ALL CARTS
@@ -116,12 +113,17 @@ public class RateLimitControllerImpl extends AbstractController {
 					content = @Content)
 	})
 	@GetMapping("/customer/{customerId}")
-	public ResponseEntity<StandardResponse> rateLimitTest(@RequestParam("customerId") String customerId) {
-		log.info("|"+name()+"|Request to Test the rate limit ");
-		List<CartEntity> cart = cartService.findByCustomerId(customerId);
-		StandardResponse stdResponse = createSuccessResponse("Cart Retrieved. Items =  "+cart.size());
-		stdResponse.setPayload(cart);
-		return ResponseEntity.ok(stdResponse);
+	public ResponseEntity<StandardResponse> rateLimitTest(@RequestHeader(value = "X-API-LICENSE") String apiLicense,
+															@PathVariable("customerId") String customerId) {
+		log.info("|"+name()+"|Request to Test the rate limit for Customer {} with License {}", customerId, apiLicense);
+		if(rateLimitService.tryConsume()) {
+			List<CartEntity> cart = cartService.findByCustomerId(customerId);
+			StandardResponse stdResponse = createSuccessResponse("Cart Retrieved. Items =  " + cart.size());
+			stdResponse.setPayload(cart);
+			return ResponseEntity.ok(stdResponse);
+		} else {
+			throw new LimitExceededException("For Fetch Carts By CustomerID!");
+		}
 	}
 
 	/**
