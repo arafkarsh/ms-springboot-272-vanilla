@@ -510,7 +510,7 @@ public class ExceptionHandlerAdvice extends ResponseEntityExceptionHandler {
     }
 
     /**
-     * InputDataException
+     * Input Data Exception
      * @param _idEx
      * @param _request
      * @return
@@ -540,6 +540,17 @@ public class ExceptionHandlerAdvice extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = MandatoryDataRequiredException.class)
     public ResponseEntity<Object> handleMandatoryDataRequiredException(MandatoryDataRequiredException _mdrEx,  WebRequest _request) {
         return createErrorResponse(_mdrEx,  "463", _request);
+    }
+
+    /**
+     * Rate Limit Exceeded Exception
+     * @param _mdrEx
+     * @param _request
+     * @return
+     */
+    @ExceptionHandler(value = LimitExceededException.class)
+    public ResponseEntity<Object> handleLimitExceededException(LimitExceededException _mdrEx,  WebRequest _request) {
+        return createErrorResponse(_mdrEx,  "464", _request);
     }
 
     /**

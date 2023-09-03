@@ -174,6 +174,22 @@
 			<version>${javax.bean.validation.version}</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/com.github.vladimir-bukhtoyarov/bucket4j-core -->
+		<!--
+		<dependency>
+			<groupId>com.github.vladimir-bukhtoyarov</groupId>
+			<artifactId>bucket4j-core</artifactId>
+			<version>7.6.0</version>
+		</dependency>
+		-->
+		<!-- https://mvnrepository.com/artifact/com.bucket4j/bucket4j_jdk8-core -->
+		<dependency>
+			<groupId>com.bucket4j</groupId>
+			<artifactId>bucket4j_jdk8-core</artifactId>
+			<version>8.3.0</version>
+		</dependency>
+
+
 		<!-- ================================================================= -->
 		<!-- Spring Testing Framework -->
 		<!-- ================================================================= -->
