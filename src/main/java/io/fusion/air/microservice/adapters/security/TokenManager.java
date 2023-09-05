@@ -239,10 +239,10 @@ public class TokenManager {
         refreshClaims.put("rol", "User");
         refreshClaims.put("jti", UUID.randomUUID().toString());
 
-
         HashMap<String, String> tokens = refreshTokens(subject, authClaims, refreshClaims);
-        String authToken = tokens.get("Authorization");
-        String refreshTkn = tokens.get("Refresh-Token");
+        String authToken = tokens.get("access_token");
+        String refreshTkn = tokens.get("refresh_token");
+
         if(headers != null) {
             headerManager.setResponseHeader(AuthorizeRequestAspect.AUTH_TOKEN, "Bearer " + authToken);
             headerManager.setResponseHeader(AuthorizeRequestAspect.REFRESH_TOKEN, refreshTkn);

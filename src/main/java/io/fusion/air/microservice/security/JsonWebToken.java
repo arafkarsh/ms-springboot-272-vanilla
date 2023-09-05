@@ -337,8 +337,15 @@ public final class JsonWebToken {
 		HashMap<String, String> tokens  = new LinkedHashMap<String, String>();
 		String tokenAuth 	= generateToken(subject, issuer, tokenAuthExpiry, claimsToken);
 		String tokenRefresh = generateToken(subject, issuer, tokenRefreshExpiry, claimsRefreshToken);
-		tokens.put("Authorization", tokenAuth);
-		tokens.put("Refresh-Token", tokenRefresh);
+		tokens.put("access_token", tokenAuth);
+		tokens.put("refresh_token", tokenRefresh);
+		tokens.put("expires_in", ""+tokenAuthExpiry);
+		tokens.put("refresh_expires_in", ""+tokenRefreshExpiry);
+		tokens.put("token_type", "Bearer");
+		tokens.put("not-before-policy", "0");
+		tokens.put("session_state", UUID.randomUUID().toString());
+		tokens.put("scope", "");
+		tokens.put("mode", "Local Auth");
 		return tokens;
 	}
 
@@ -364,8 +371,20 @@ public final class JsonWebToken {
 		HashMap<String, String> tokens  = new LinkedHashMap<String, String>();
 		String tokenAuth 	= generateToken(subject, issuer, tokenAuthExpiry, claimsToken);
 		String tokenRefresh = generateToken(subject, issuer, tokenRefreshExpiry, claimsRefreshToken);
-		tokens.put("Authorization", tokenAuth);
-		tokens.put("Refresh-Token", tokenRefresh);
+		tokens.put("access_token", tokenAuth);
+		tokens.put("refresh_token", tokenRefresh);
+		try {
+			tokens.put("expires_in", "" + (tokenAuthExpiry / 1000));
+			tokens.put("refresh_expires_in", "" + (tokenRefreshExpiry / 1000));
+		} catch (Exception e) {
+			tokens.put("expires_in", "" + tokenAuthExpiry);
+			tokens.put("refresh_expires_in", "" + tokenRefreshExpiry);
+		}
+		tokens.put("token_type", "Bearer");
+		tokens.put("not-before-policy", "0");
+		tokens.put("session_state", UUID.randomUUID().toString());
+		tokens.put("scope", "");
+		tokens.put("mode", "Local Auth");
 		return tokens;
 	}
 

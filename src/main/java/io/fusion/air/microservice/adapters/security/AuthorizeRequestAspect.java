@@ -32,7 +32,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.annotation.RequestScope;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -48,7 +47,6 @@ import static org.slf4j.LoggerFactory.getLogger;
  */
 @Aspect
 @Component
-@RequestScope
 public class AuthorizeRequestAspect {
 
     // Set Logger -> Lookup will automatically determine the class name.
@@ -71,9 +69,6 @@ public class AuthorizeRequestAspect {
 
     @Autowired
     private KeyCloakConfig keyCloakConfig;
-
-    @Autowired
-    private JsonWebToken jwtUtil;
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
@@ -197,7 +192,18 @@ public class AuthorizeRequestAspect {
         // If the User == NULL then ERROR is thrown from getUser() method itself
         // Check the Tx Token if It's NOT a SINGLE_TOKEN Request
         if(!singleToken ) {
-            validateAndSetClaimsFromTxToken(startTime, user, tokenKey, request.getHeader(TX_TOKEN), joinPoint);
+            if(tokenDataFactory.isKeyCloakEnabled()) {
+                TokenData tokenData = tokenDataFactory.createTokenData(token);
+                String puser = jwtValidator.getCloakPreferredUser(tokenData);
+                if(puser == null) {
+                    String msg = "Auth-Token: Unable to Extract preferred username! " + user;
+                    throw new AuthorizationException(msg);
+                } else {
+                    validateAndSetClaimsFromTxToken(startTime, puser, tokenKey, request.getHeader(TX_TOKEN), joinPoint);
+                }
+            } else {
+                validateAndSetClaimsFromTxToken(startTime, user, tokenKey, request.getHeader(TX_TOKEN), joinPoint);
+            }
         }
         return joinPoint.proceed();
     }
@@ -234,7 +240,6 @@ public class AuthorizeRequestAspect {
         String user = null;
         String msg = null;
         try {
-            // user = jwtUtil.getSubjectFromToken(token);
             user = jwtValidator.getSubjectFromToken(tokenDataFactory.createTokenData(token));
             // Store the user info for logging
             MDC.put("user", user);
@@ -283,8 +288,6 @@ public class AuthorizeRequestAspect {
             TokenData tokenData = tokenDataFactory.createTokenData(token);
             // Validate the Token
             if(jwtValidator.validateToken(userDetails.getUsername(), tokenData)) {
-            // if (jwtUtil.validateToken(userDetails.getUsername(), token)) {
-               //  String role = jwtUtil.getUserRoleFromToken(token);
                 String role = jwtValidator.getUserRoleFromToken(tokenData);
                 // Set the Claims ONLY If it's a Single Token
                 // Claims claims = jwtUtil.getAllClaims(token);
@@ -303,8 +306,6 @@ public class AuthorizeRequestAspect {
                     if (tokenKey.equalsIgnoreCase(AUTH_TOKEN)) {
                         annotation = signature.getMethod().getAnnotation(AuthorizationRequired.class);
                         annotationRole = annotation.role();
-                        // } else {
-                        //    annotation = signature.getMethod().getAnnotation(ValidateRefreshToken.class);
                     }
                 } catch (Exception ignored) {
                     log.warn("Role Not Found > "+ignored.getMessage());
@@ -423,9 +424,6 @@ public class AuthorizeRequestAspect {
             TokenData tokenData = tokenDataFactory.createLocalTokenData(token);
             // Validate the Token
             if(jwtValidator.validateToken(user, tokenData)) {
-            // if (jwtUtil.validateToken(user, token)) {
-
-                // claims = jwtUtil.getAllClaims(token);
                 claims = jwtValidator.getAllClaims(tokenData);
                 String tokenType = null;
                 try {
@@ -443,7 +441,8 @@ public class AuthorizeRequestAspect {
                 claimsManager.isClaimsInitialized();
                 logTime(startTime, "SUCCESS", "TX-Token: User TX Authorized for the request",  joinPoint);
             }  else {
-                msg = "TX-Token: Unauthorized Access: Token Validation FAILED!";
+                msg = "TX-Token: Unauthorized Access: Token Validation FAILED! for "+user;
+                System.out.println("Unable to Validate the Tx-Token for User: "+user);
                 throw new AuthorizationException(msg);
             }
         } catch(AuthorizationException e) {

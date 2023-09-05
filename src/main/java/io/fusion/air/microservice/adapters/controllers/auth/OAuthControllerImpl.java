@@ -111,8 +111,9 @@ public class OAuthControllerImpl extends AbstractController {
 		StandardResponse stdResponse = createSuccessResponse("User Authenticated (Locally) Successfully");
 		stdResponse.setPayload(tokens);
 
+		System.out.println("Pass 1: Refresh Token : "+tokens.get("refresh_token"));
 		// Store the Token in Cookies (Encrypted) for "Remember Me" functionality
-		Utils.createSecureCookieHeaders(headers, "RSH", SecureData.encrypt(tokens.get("Refresh-Token")));
+		Utils.createSecureCookieHeaders(headers, "RSH", SecureData.encrypt(tokens.get("refresh_token")));
 		Utils.createSecureCookieHeaders(headers, "TSH", SecureData.encrypt(txToken));
 
 		// Return the response entity with the custom headers and body
@@ -239,8 +240,8 @@ public class OAuthControllerImpl extends AbstractController {
 	/**
 	 * Test if the User is Authorized
 	 */
-	@SingleTokenAuthorizationRequired(role="user")
-	// @AuthorizationRequired(role = "user")
+	// @SingleTokenAuthorizationRequired(role="user")
+	@AuthorizationRequired(role = "user")
 	@Operation(summary = "Test the KeyCloak Token Validation using Public Key", security = { @SecurityRequirement(name = "bearer-key") })
 	@ApiResponses(value = {
 			@ApiResponse(responseCode = "200",

@@ -117,8 +117,8 @@ public class ServiceEventListener {
 		// Step 4: Generate Authorize Tokens
 		HashMap<String, String> tokens = tokenManager.createAuthorizationToken(subject, null);
 
-		String token = tokens.get("Authorization");
-		String refresh = tokens.get("Refresh-Token");
+		String token = tokens.get("access_token");
+		String refresh = tokens.get("refresh_token");
 		log.debug("\nToken Expiry in Days:Hours:Mins  {} ", JsonWebToken.printExpiryTime(tokenAuthExpiry));
 		jsonWebToken.tokenStats(token, false, false);
 

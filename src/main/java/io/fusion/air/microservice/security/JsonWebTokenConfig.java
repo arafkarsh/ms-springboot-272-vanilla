@@ -38,6 +38,9 @@ import java.io.Serializable;
         // value = "classpath:application2.properties,file:./application.properties")
 public class JsonWebTokenConfig implements Serializable {
 
+    @Value("${service.org:OrgNotDefined}")
+    private String serviceOrg;
+
     // server.crypto.public.key=publicKey.pem
     @Value("${server.crypto.public.key:publicKey.pem}")
     private String cryptoPublicKeyFile;
@@ -110,5 +113,9 @@ public class JsonWebTokenConfig implements Serializable {
 
     public String getSecureDataKey() {
         return secureDataKey;
+    }
+
+    public String getServiceOrg() {
+        return serviceOrg;
     }
 }

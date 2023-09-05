@@ -2,7 +2,7 @@
 # MS-Vanilla Service Properties
 # =======================================================================
 build.number=106
-build.date=Tue Sep 5 20:33:08 IST 2023
+build.date=Tue Sep 5 20:27:13 IST 2023
 # ------------------------------------------------------------------------
 # Spring Profile
 # ------------------------------------------------------------------------
@@ -46,8 +46,11 @@ server.crypto.private.key=privateKey.pem
 server.token.issuer=${service.org}
 server.token.type=1
 server.token.test=true
-server.token.auth.expiry=300000
-server.token.refresh.expiry=1800000
+#server.token.auth.expiry=600000
+#server.token.refresh.expiry=3600000
+# ONLY FOR TESTING PURPOSE
+server.token.auth.expiry=10800000
+server.token.refresh.expiry=18000000
 server.token.key=<([1234567890SecretKey!!To??Encrypt##Data@12345%6790])>
 server.secure.data.key=<([1234567890SecretKEY!!TO??Encrypt##DATA@12345%6790])>
 # ------------------------------------------------------------------------

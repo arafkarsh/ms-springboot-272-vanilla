@@ -134,6 +134,18 @@ public final class JsonWebTokenValidator {
 		return (role == null) ? "Public" : role;
 	}
 
+	/**
+	 * Get the Cloak User from the Token
+	 * @param token
+	 * @return
+	 */
+	public String getCloakPreferredUser(TokenData token) {
+		Claims claims = getAllClaims(token);
+		String subject = (String) claims.get("sub");
+		String puser = (String) claims.get("preferred_username");
+		return (puser == null) ? subject: puser;
+	}
+
 	public <T> T getClaimFromToken(TokenData _token,
 								   Function<Claims, T> _claimsResolver) {
 		return _claimsResolver.apply(getAllClaims(_token));

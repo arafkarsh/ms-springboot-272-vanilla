@@ -40,9 +40,11 @@ public class TokenDataFactory {
 
     public TokenData createTokenData(String _token) {
         if(keyCloakConfig.isKeyCloakEnabled()) {
-            return new TokenData(_token, keyCloakConfig.getTokenIssuer(), KEYCLOAK_KEY, jwt.getValidatorKey());
+            return createKeyCloakTokenData( _token);
+            // return new TokenData(_token, keyCloakConfig.getTokenIssuer(), KEYCLOAK_KEY, jwt.getValidatorKey());
         } else {
-            return new TokenData(_token, jwtConfig.getTokenIssuer(), LOCAL_KEY, jwt.getValidatorLocalKey());
+            return createLocalTokenData( _token);
+            // return new TokenData(_token, jwtConfig.getTokenIssuer(), LOCAL_KEY, jwt.getValidatorLocalKey());
         }
     }
 
@@ -52,6 +54,10 @@ public class TokenDataFactory {
 
     public TokenData createKeyCloakTokenData(String _token) {
         return new TokenData(_token, keyCloakConfig.getTokenIssuer() , KEYCLOAK_KEY,  jwt.getValidatorKey());
+    }
+
+    public boolean isKeyCloakEnabled() {
+    	return keyCloakConfig.isKeyCloakEnabled();
     }
 
 }
