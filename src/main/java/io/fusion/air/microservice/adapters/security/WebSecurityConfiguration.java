@@ -16,17 +16,15 @@
 package io.fusion.air.microservice.adapters.security;
 
 import io.fusion.air.microservice.adapters.filters.ProductFilter;
-import io.fusion.air.microservice.adapters.filters.SecurityFilter;
 import io.fusion.air.microservice.server.config.ServiceConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.web.access.channel.ChannelProcessingFilter;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
 import org.springframework.security.web.firewall.HttpFirewall;
@@ -34,7 +32,6 @@ import org.springframework.security.web.firewall.StrictHttpFirewall;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.security.web.csrf.CsrfToken;
 
 import javax.servlet.Filter;
@@ -53,14 +50,11 @@ import java.util.regex.Pattern;
  * @version:
  * @date:
  */
+@Configuration
 @EnableWebSecurity
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
-
     @Autowired
     private ServiceConfiguration serviceConfig;
-
-    // @Autowired
-    // private ProductFilter productFilter;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -72,13 +66,14 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         // 1. @Component annotation Filter will be applicable Globally
         // 2. @WebFilter Annotation you can specific the path it applies
         // 3. As part of the Web Security Configuration (shown below)
-        http
+        // http
             // Apply only to paths that start with /product/
-            // .antMatcher(apiPath + "/product/**")
+            //.antMatcher(apiPath + "/product/**")
             // Add Product Filter After Security Filter. You can apply Before also.
-            //.addFilterAfter(productFilter, UsernamePasswordAuthenticationFilter.class)
+            //.addFilterAfter(productFilter, UsernamePasswordAuthenticationFilter.class);
 
-             // Authorize Requests
+        http
+            // Authorize Requests
             .authorizeRequests()
             .antMatchers(apiPath + "/**")
             .permitAll()

@@ -59,7 +59,6 @@ import org.springframework.stereotype.Component;
  * }
  *
  */
-// @Component
 @WebFilter(urlPatterns = "/ms-vanilla/api/v1/product/*")
 @Order(50)
 public class ProductFilter implements Filter {
