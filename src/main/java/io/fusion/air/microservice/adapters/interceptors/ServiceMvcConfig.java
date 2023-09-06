@@ -52,8 +52,6 @@ public class ServiceMvcConfig implements WebMvcConfigurer {
         log.info("Paths Excluded = "+serviceApiPath+"/cart/rate/limit/all");
         log.info("Paths Excluded = "+serviceApiPath+"/**");
 
-        System.out.println("<><> Paths Included = "+serviceApiPath+"/cart/rate/limit/**");
-
         registry.addInterceptor(rateLimitInterceptor)
                 // Included paths
                 .addPathPatterns(serviceApiPath + "/cart/rate/limit/**")
