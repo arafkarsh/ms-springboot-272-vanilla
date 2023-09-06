@@ -59,18 +59,15 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * you have some conditional logic within the filter's doFilter method to exclude certain paths or requests.
  */
 @Component
-//@Order(2)
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class SecurityFilter extends OncePerRequestFilter {
     // Set Logger -> Lookup will automatically determine the class name.
     private static final Logger log = getLogger(lookup().lookupClass());
+    @Autowired
+    private ServiceConfiguration serviceConfig;
 
     /**
-     * Same contract as for {@code doFilter}, but guaranteed to be
-     * just invoked once per request within a single request thread.
-     * See {@link #shouldNotFilterAsyncDispatch()} for details.
-     * <p>Provides HttpServletRequest and HttpServletResponse arguments instead of the
-     * default ServletRequest and ServletResponse ones.
+     * Security Filter To Check Http Firewall status and throw exception if the Firewall rejects the request.
      *
      * @param _servletRequest
      * @param _servletResponse
@@ -96,9 +93,12 @@ public class SecurityFilter extends OncePerRequestFilter {
             HeaderManager.returnHeaders(request, response);
         } catch (RequestRejectedException e) {
             if (!response.isCommitted()) {
+                String service = (serviceConfig != null) ? serviceConfig.getServiceName() : "Unknown";
+                String errorPrefix = (serviceConfig != null) ? serviceConfig.getServiceAPIErrorPrefix() : "AK";
+                MDC.put("Service", service);
                 StandardResponse error = Utils.createErrorResponse(
-                    null,"", "AA100", HttpStatus.FORBIDDEN,
-                    "The request was rejected by Firewall");
+                    null,errorPrefix, "403", HttpStatus.FORBIDDEN,
+                    "The request was rejected by Firewall!");
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 response.setContentType("application/json");
                 String json = Utils.toJsonString(error);
@@ -106,7 +106,8 @@ public class SecurityFilter extends OncePerRequestFilter {
                 PrintWriter out = response.getWriter();
                 out.write(json);
                 out.flush();
-                System.out.println(">1>>>  Request Rejected by Firewall "+e.getMessage());
+                MDC.clear();
+                log.info("Path={}|Firewall={}", request.getRequestURI(), e.getMessage());
             }
         }
     }
