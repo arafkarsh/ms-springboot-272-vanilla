@@ -16,10 +16,6 @@
 
 package io.fusion.air.microservice.security;
 
-import io.fusion.air.microservice.server.config.ServiceConfiguration;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,13 +27,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Key;
 import java.security.interfaces.RSAPublicKey;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.function.Function;
-
 
 /**
- * 
+ * JsonWebToken Key Manager
+ * Loads Secret Key, Public Keys depends upon the configuration.
+ *
  * @author arafkarsh
  *
  */

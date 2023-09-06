@@ -170,7 +170,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
      * Disable the Bean for Testing SQL Injection and Http Response Splitting Attacks.
      * @return
      */
-    // @Bean
+    @Bean
     public StrictHttpFirewall httpFirewall() {
         StrictHttpFirewall firewall = new StrictHttpFirewall();
         firewall.setAllowedHttpMethods(Arrays.asList("GET","POST", "PUT", "DELETE"));
@@ -185,7 +185,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
      * @return
      * @see #httpFirewall()
      */
-    @Bean
+    // @Bean
     public HttpFirewall defaultHttpFirewall() {
         return new DefaultHttpFirewall();
     }
