@@ -15,13 +15,17 @@
  */
 package io.fusion.air.microservice.adapters.filters;
 // Custom
+import io.fusion.air.microservice.domain.models.core.StandardResponse;
 import io.fusion.air.microservice.server.config.ServiceConfiguration;
 import io.fusion.air.microservice.utils.Utils;
 // Spring
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.stereotype.Component;
 // Servlet
 import javax.servlet.Filter;
@@ -32,11 +36,13 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.UUID;
 // SLF4J
 import static java.lang.invoke.MethodHandles.lookup;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.slf4j.Logger;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 
 /**
@@ -53,26 +59,56 @@ import org.slf4j.Logger;
  * you have some conditional logic within the filter's doFilter method to exclude certain paths or requests.
  */
 @Component
-@Order(2)
-public class SecurityFilter implements Filter {
+//@Order(2)
+@Order(Ordered.HIGHEST_PRECEDENCE)
+public class SecurityFilter extends OncePerRequestFilter {
     // Set Logger -> Lookup will automatically determine the class name.
     private static final Logger log = getLogger(lookup().lookupClass());
 
+    /**
+     * Same contract as for {@code doFilter}, but guaranteed to be
+     * just invoked once per request within a single request thread.
+     * See {@link #shouldNotFilterAsyncDispatch()} for details.
+     * <p>Provides HttpServletRequest and HttpServletResponse arguments instead of the
+     * default ServletRequest and ServletResponse ones.
+     *
+     * @param _servletRequest
+     * @param _servletResponse
+     * @param _filterChain
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
-    public void doFilter(ServletRequest _servletRequest, ServletResponse _servletResponse, FilterChain _filterChain)
-            throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest _servletRequest, HttpServletResponse _servletResponse,
+                                    FilterChain _filterChain) throws ServletException, IOException {
 
         HttpServletRequest request = (HttpServletRequest) _servletRequest;
         HttpServletResponse response = (HttpServletResponse) _servletResponse;
 
-        HttpHeaders headers = Utils.createSecureCookieHeaders("JSESSIONID", UUID.randomUUID().toString(), 3000);
-        response.setHeader("Set-Cookie", headers.getFirst("Set-Cookie"));
-        System.out.println("<[2]>>> Security Filter Called => "+ headers.getFirst("Set-Cookie"));
+        try {
+            HttpHeaders headers = Utils.createSecureCookieHeaders("JSESSIONID", UUID.randomUUID().toString(), 3000);
+            System.out.println("<[2]>>> Security Filter Called => "+ headers.getFirst("Set-Cookie"));
 
-        // Return the Headers
-        HeaderManager.returnHeaders(request, response);
+            _filterChain.doFilter(request, response);
 
-        _filterChain.doFilter(request, response);
+            response.setHeader("Set-Cookie", headers.getFirst("Set-Cookie"));
+            // Return the Headers
+            HeaderManager.returnHeaders(request, response);
+        } catch (RequestRejectedException e) {
+            if (!response.isCommitted()) {
+                StandardResponse error = Utils.createErrorResponse(
+                    null,"", "AA100", HttpStatus.FORBIDDEN,
+                    "The request was rejected by Firewall");
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                response.setContentType("application/json");
+                String json = Utils.toJsonString(error);
+
+                PrintWriter out = response.getWriter();
+                out.write(json);
+                out.flush();
+                System.out.println(">1>>>  Request Rejected by Firewall "+e.getMessage());
+            }
+        }
     }
 }
 
