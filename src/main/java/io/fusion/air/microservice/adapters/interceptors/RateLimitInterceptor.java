@@ -47,8 +47,7 @@ public class RateLimitInterceptor implements HandlerInterceptor {
      * @throws Exception
      */
     @Override
-    public boolean preHandle(HttpServletRequest _request, HttpServletResponse _response,
-                             Object _handler) throws Exception {
+    public boolean preHandle(HttpServletRequest _request, HttpServletResponse _response, Object _handler) throws Exception {
         String licenseKey = "FREE000-000";
         try {
             licenseKey = _request.getHeader(RateLimitService.LICENSE_KEY_HEADER);
@@ -58,17 +57,13 @@ public class RateLimitInterceptor implements HandlerInterceptor {
                 licenseKey = "FREE000-000";
             }
         }
-        System.out.println("<><> Rate Limit = "+licenseKey);
         Bucket tokenBucket = rateLimitService.getBucketForLicense(licenseKey);
         ConsumptionProbe probe = tokenBucket.tryConsumeAndReturnRemaining(1);
         if (probe.isConsumed()) {
-            System.out.println("<><> X-Rate-Limit-Remaining = "+probe.getRemainingTokens());
-
             _response.addHeader("X-Rate-Limit-Remaining", String.valueOf(probe.getRemainingTokens()));
             return true;
         } else {
             long waitForRefill = probe.getNanosToWaitForRefill() / 1_000_000_000;
-            System.out.println("<><> X-Rate-Limit-Retry-After-Seconds = "+waitForRefill);
             _response.addHeader("X-Rate-Limit-Retry-After-Seconds", String.valueOf(waitForRefill));
             throw new LimitExceededException("You have exhausted your API Request Quota");
         }
