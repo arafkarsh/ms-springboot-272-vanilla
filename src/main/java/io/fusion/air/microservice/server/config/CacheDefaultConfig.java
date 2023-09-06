@@ -36,5 +36,10 @@ public class CacheDefaultConfig {
     @Bean(name="RateLimitCacheManager")
     public CacheManager cacheManager() {
         return new ConcurrentMapCacheManager(RATE_LIMIT_CACHE);
+        // Redis Cache Manager
+        // Hazelcast
+        // JCache
+        // EhCache
+        // Oracle Coherence
     }
 }

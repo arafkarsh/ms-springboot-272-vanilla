@@ -46,7 +46,6 @@ public class RateLimitService {
     @Autowired
     private CacheManager cacheManager;      // Autowire the Cache Manager
 
-
     /**
      * Try to Consume the Freemium Bucket
      * @return
@@ -76,6 +75,8 @@ public class RateLimitService {
 
     /**
      * Get Bucket for the License Key
+     * Cache Bucket is created Per Customer Per Subscription Plan
+     *
      * @param licenseKey
      * @return
      */

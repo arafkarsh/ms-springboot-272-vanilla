@@ -18,29 +18,28 @@ package io.fusion.air.microservice.adapters.filters;
 import io.fusion.air.microservice.server.config.ServiceConfiguration;
 import io.fusion.air.microservice.utils.Utils;
 // Spring
-import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpHeaders;
-import org.springframework.stereotype.Component;
 // Servlet
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.UUID;
 // SLF4J
 import static java.lang.invoke.MethodHandles.lookup;
 import static org.slf4j.LoggerFactory.getLogger;
 import org.slf4j.Logger;
-
+import org.slf4j.MDC;
+import org.springframework.http.HttpHeaders;
+import org.springframework.stereotype.Component;
 
 /**
- * Servlet Filter for Security Example
+ * Servlet Filter with WebFilter Example
  *
  * @author: Araf Karsh Hamid
  * @version:
@@ -48,13 +47,22 @@ import org.slf4j.Logger;
  */
 
 /**
- * In a Spring Boot application, if you annotate your filter class with @Component, Spring's auto-configuration
- * picks it up and applies it globally to every request. This means it will act on all incoming requests, unless
- * you have some conditional logic within the filter's doFilter method to exclude certain paths or requests.
+ * WebSecurityConfigurerAdapter, then its scope of application will depend on the specific configurations you make
+ * in the configure(HttpSecurity http) method. You can use methods like antMatcher or antMatchers to specify which
+ * routes the filter should apply to.
+ * @Override
+ * protected void configure(HttpSecurity http) throws Exception {
+ *     http
+ *          // Apply only to paths that start with /ms-vanilla/api/v1/product/
+ *         .antMatcher("/ms-vanilla/api/v1/product/**")
+ *         .addFilterBefore(productFilter, io.fusion.air.microservice.adapters.filters.SecurityFilter.class);
+ * }
+ *
  */
-@Component
-@Order(2)
-public class SecurityFilter implements Filter {
+// @Component
+@WebFilter(urlPatterns = "/ms-vanilla/api/v1/product/*")
+@Order(50)
+public class ProductFilter implements Filter {
     // Set Logger -> Lookup will automatically determine the class name.
     private static final Logger log = getLogger(lookup().lookupClass());
 
@@ -65,12 +73,11 @@ public class SecurityFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) _servletRequest;
         HttpServletResponse response = (HttpServletResponse) _servletResponse;
 
-        HttpHeaders headers = Utils.createSecureCookieHeaders("JSESSIONID", UUID.randomUUID().toString(), 3000);
-        response.setHeader("Set-Cookie", headers.getFirst("Set-Cookie"));
-        System.out.println("<[2]>>> Security Filter Called => "+ headers.getFirst("Set-Cookie"));
+        HttpHeaders headers = Utils.createSecureCookieHeaders("PROD-RID", MDC.get("ReqId"), 300);
+        response.addHeader("Set-Cookie", headers.getFirst("Set-Cookie"));
 
-        // Return the Headers
-        HeaderManager.returnHeaders(request, response);
+        System.out.println("<[5]>>> Product Filter Called => "+ headers.getFirst("Set-Cookie"));
+
 
         _filterChain.doFilter(request, response);
     }

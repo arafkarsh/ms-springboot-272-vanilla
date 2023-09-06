@@ -14,27 +14,40 @@
  * limitations under the License.
  */
 package io.fusion.air.microservice.adapters.filters;
-
+// Custom
 import io.fusion.air.microservice.server.config.ServiceConfiguration;
 import io.fusion.air.microservice.utils.CPU;
-import org.slf4j.Logger;
-import org.slf4j.MDC;
+// Spring
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
-
-import javax.servlet.*;
+// Servlet
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-
+// SLF4J
 import static java.lang.invoke.MethodHandles.lookup;
 import static org.slf4j.LoggerFactory.getLogger;
+import org.slf4j.Logger;
+import org.slf4j.MDC;
 
 /**
+ * Servlet Filter for Log Example
+ *
  * @author: Araf Karsh Hamid
  * @version:
  * @date:
+ */
+
+/**
+ * In a Spring Boot application, if you annotate your filter class with @Component, Spring's auto-configuration
+ * picks it up and applies it globally to every request. This means it will act on all incoming requests, unless
+ * you have some conditional logic within the filter's doFilter method to exclude certain paths or requests.
  */
 @Component
 @Order(1)
@@ -49,6 +62,9 @@ public class LogFilter implements Filter {
     @Override
     public void doFilter(ServletRequest _servletRequest, ServletResponse _servletResponse, FilterChain _filterChain)
             throws IOException, ServletException {
+
+        System.out.println("<[1]>>> Log Filter Called");
+
         String name= (serviceConfig != null) ? serviceConfig.getServiceName(): "NotDefined";
         MDC.put("Service", name);
 

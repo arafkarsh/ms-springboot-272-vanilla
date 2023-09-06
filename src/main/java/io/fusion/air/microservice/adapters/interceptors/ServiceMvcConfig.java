@@ -48,9 +48,9 @@ public class ServiceMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        log.info("Paths Included = "+serviceApiPath+"/cart/rate/limit/**");
-        log.info("Paths Excluded = "+serviceApiPath+"/cart/rate/limit/all");
-        log.info("Paths Excluded = "+serviceApiPath+"/**");
+        log.debug("Paths Included = "+serviceApiPath+"/cart/rate/limit/**");
+        log.debug("Paths Excluded = "+serviceApiPath+"/cart/rate/limit/all");
+        log.debug("Paths Excluded = "+serviceApiPath+"/**");
 
         registry.addInterceptor(rateLimitInterceptor)
                 // Included paths

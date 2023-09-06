@@ -367,7 +367,7 @@ public final class Utils {
 		c.setSecure(true);
 		c.setHttpOnly(true);
 		c.setMaxAge(_age);
-		// c.setPath(request.getRequestURI());
+		c.setPath(request.getRequestURI());
 		return c;
 	}
 
@@ -382,6 +382,16 @@ public final class Utils {
 		return createSecureCookie( MDC.get("URI"), _key, _value, 3600);
 	}
 
+	/**
+	 * Create Secure Cookie
+	 * @param _key
+	 * @param _value
+	 * @param _age
+	 * @return
+	 */
+	public static String createSecureCookie(String _key, String _value, int _age) {
+		return createSecureCookie( MDC.get("URI"), _key, _value, _age);
+	}
 	/**
 	 * Create Secure Cookie
 	 *

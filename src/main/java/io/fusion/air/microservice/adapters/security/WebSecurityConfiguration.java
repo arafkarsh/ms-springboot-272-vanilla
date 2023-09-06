@@ -15,6 +15,8 @@
  */
 package io.fusion.air.microservice.adapters.security;
 
+import io.fusion.air.microservice.adapters.filters.ProductFilter;
+import io.fusion.air.microservice.adapters.filters.SecurityFilter;
 import io.fusion.air.microservice.server.config.ServiceConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +25,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
@@ -56,18 +59,33 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
     private ServiceConfiguration serviceConfig;
 
+    // @Autowired
+    // private ProductFilter productFilter;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         // Forces All Request to be Secured (HTTPS)
         // http.requiresChannel().anyRequest().requiresSecure();
         String apiPath = serviceConfig.getApiDocPath();
-        http.authorizeRequests()
-                .antMatchers(apiPath + "/**")
-                .permitAll()
-                .and()
-                // This configures exception handling, specifically specifying that when a user tries to access a page
-                // they're not authorized to view, they're redirected to "/403" (typically an "Access Denied" page).
-                .exceptionHandling().accessDeniedPage("/403");
+        // Add Custom Filters for a Specific URL Path
+        // Filters Can be Added in 3 ways
+        // 1. @Component annotation Filter will be applicable Globally
+        // 2. @WebFilter Annotation you can specific the path it applies
+        // 3. As part of the Web Security Configuration (shown below)
+        http
+            // Apply only to paths that start with /product/
+            // .antMatcher(apiPath + "/product/**")
+            // Add Product Filter After Security Filter. You can apply Before also.
+            //.addFilterAfter(productFilter, UsernamePasswordAuthenticationFilter.class)
+
+             // Authorize Requests
+            .authorizeRequests()
+            .antMatchers(apiPath + "/**")
+            .permitAll()
+            .and()
+            // This configures exception handling, specifically specifying that when a user tries to access a page
+            // they're not authorized to view, they're redirected to "/403" (typically an "Access Denied" page).
+            .exceptionHandling().accessDeniedPage("/403");
 
         // Enable CSRF Protection
         // This line configures the Cross-Site Request Forgery (CSRF) protection, using a header-based CSRF token
@@ -117,13 +135,18 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         // (script-src) and objects (object-src) are only allowed from the same origin ('self') or from a subdomain of
         // the specified host name.
         http.headers()
-                .contentSecurityPolicy(
-                        "default-src 'self'; "
-                        +"script-src 'self' *."+hostName+"; "
-                        +"object-src 'self' *."+hostName+"; "
-                        +"img-src 'self'; media-src 'self'; "
-                        +"frame-src 'self'; font-src 'self'; "
-                        +"connect-src 'self'");
+            .contentSecurityPolicy(
+                "default-src 'self'; "
+                +"script-src 'self' *."+hostName+"; "
+                +"object-src 'self' *."+hostName+"; "
+                +"img-src 'self'; media-src 'self'; "
+                +"frame-src 'self'; font-src 'self'; "
+                +"connect-src 'self'");
+    }
+
+    // @Bean
+    public Filter getProductFilter() {
+        return new ProductFilter();
     }
 
     /**
