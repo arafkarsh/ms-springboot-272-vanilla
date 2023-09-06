@@ -18,9 +18,9 @@ package io.fusion.air.microservice.adapters.security;
 import io.fusion.air.microservice.adapters.filters.ProductFilter;
 import io.fusion.air.microservice.server.config.ServiceConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -61,17 +61,6 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         // Forces All Request to be Secured (HTTPS)
         // http.requiresChannel().anyRequest().requiresSecure();
         String apiPath = serviceConfig.getApiDocPath();
-        // Add Custom Filters for a Specific URL Path
-        // Filters Can be Added in 3 ways
-        // 1. @Component annotation Filter will be applicable Globally
-        // 2. @WebFilter Annotation you can specific the path it applies
-        // 3. As part of the Web Security Configuration (shown below)
-        // http
-            // Apply only to paths that start with /product/
-            //.antMatcher(apiPath + "/product/**")
-            // Add Product Filter After Security Filter. You can apply Before also.
-            //.addFilterAfter(productFilter, UsernamePasswordAuthenticationFilter.class);
-
         http
             // Authorize Requests
             .authorizeRequests()
@@ -206,6 +195,16 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     // @Bean
     public HttpFirewall defaultHttpFirewall() {
         return new DefaultHttpFirewall();
+    }
+
+    @Bean
+    public FilterRegistrationBean<ProductFilter> productFilterRegistration() {
+        String apiPath = serviceConfig.getServiceApiPath() + "/product/*";
+        FilterRegistrationBean<ProductFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(new ProductFilter());
+        // Add URL patterns here
+        registrationBean.addUrlPatterns( apiPath);
+        return registrationBean;
     }
 
     /**
