@@ -82,10 +82,12 @@ public class TimeTrackerAspect {
      * @return
      * @throws Throwable
      */
+    /**
     @Around(value = "execution(* io.fusion.air.microservice.adapters.controllers.exploits.*.*(..))")
     public Object timeTrackerRestFixed(ProceedingJoinPoint joinPoint) throws Throwable {
         return trackTime("WS1", joinPoint);
     }
+    */
 
     /**
      * Capture Overall Method Execution Time For Controllers
@@ -93,10 +95,12 @@ public class TimeTrackerAspect {
      * @return
      * @throws Throwable
      */
+    /**
     @Around(value = "execution(* io.fusion.air.microservice.adapters.controllers.open.*.*(..))")
     public Object timeTrackerRestOpen(ProceedingJoinPoint joinPoint) throws Throwable {
         return trackTime("WS2", joinPoint);
     }
+    */
 
     /**
      * Capture Overall Method Execution Time for Secured Controllers
@@ -104,10 +108,12 @@ public class TimeTrackerAspect {
      * @return
      * @throws Throwable
      */
+    /**
     @Around(value = "execution(* io.fusion.air.microservice.adapters.controllers.secured.*.*(..))")
     public Object timeTrackerRestSecured(ProceedingJoinPoint joinPoint) throws Throwable {
         return trackTime("WS3", joinPoint);
     }
+    */
 
     /**
      * Capture Overall Method Execution Time for Business Services
@@ -115,7 +121,7 @@ public class TimeTrackerAspect {
      * @return
      * @throws Throwable
      */
-    @Around(value = "execution(* io.fusion.air.microservice.adapters.service.*.*(..))")
+    @Around(value = "execution(* io.fusion.air.microservice.adapters.service..*.*(..))")
     public Object timeTrackerBusinessService(ProceedingJoinPoint joinPoint) throws Throwable {
         return trackTime("BS", joinPoint);
     }
@@ -126,7 +132,7 @@ public class TimeTrackerAspect {
      * @return
      * @throws Throwable
      */
-    @Around(value = "execution(* io.fusion.air.microservice.adapters.repository.*.*(..))")
+    @Around(value = "execution(* io.fusion.air.microservice.adapters.repository..*.*(..))")
     public Object timeTrackerRepository(ProceedingJoinPoint joinPoint) throws Throwable {
         return trackTime("DS", joinPoint);
     }
@@ -137,7 +143,7 @@ public class TimeTrackerAspect {
      * @return
      * @throws Throwable
      */
-    @Around(value = "execution(* io.fusion.air.microservice.adapters.external.*.*(..))")
+    @Around(value = "execution(* io.fusion.air.microservice.adapters.external..*.*(..))")
     public Object timeTrackerExternal(ProceedingJoinPoint joinPoint) throws Throwable {
         return trackTime("ES", joinPoint);
     }
